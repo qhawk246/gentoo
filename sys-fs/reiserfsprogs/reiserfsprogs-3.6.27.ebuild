@@ -1,4 +1,4 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -17,6 +17,7 @@ IUSE="static-libs"
 
 PATCHES=(
 	"${FILESDIR}/${PN}-3.6.25-no_acl.patch"
+	"${FILESDIR}/${PN}-3.6.27-loff_t.patch"
 )
 
 src_prepare() {
@@ -38,12 +39,12 @@ src_configure() {
 src_install() {
 	default
 	dodir /usr/$(get_libdir)
-	mv "${D}"/$(get_libdir)/pkgconfig "${D}"/usr/$(get_libdir) || die
+	mv "${ED}"/$(get_libdir)/pkgconfig "${ED}"/usr/$(get_libdir) || die
 
 	if use static-libs ; then
-		mv "${D}"/$(get_libdir)/*a "${D}"/usr/$(get_libdir) || die
+		mv "${ED}"/$(get_libdir)/*a "${ED}"/usr/$(get_libdir) || die
 		gen_usr_ldscript libreiserfscore.so
 	else
-		find "${D}" -type f \( -name "*.a" -o -name "*.la" \) -delete
+		find "${ED}" -type f \( -name "*.a" -o -name "*.la" \) -delete
 	fi
 }

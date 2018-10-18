@@ -1,4 +1,4 @@
-# Copyright 1999-2016 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -8,13 +8,13 @@ EAPI=6
 CABAL_FEATURES="lib profile haddock hoogle hscolour test-suite"
 inherit haskell-cabal
 
-DESCRIPTION="Reading, writing and manipulating \".tar\" archive files"
+DESCRIPTION="Reading, writing and manipulating '.tar' archive files"
 HOMEPAGE="http://hackage.haskell.org/package/tar"
 SRC_URI="mirror://hackage/packages/archive/${PN}/${PV}/${P}.tar.gz"
 
 LICENSE="BSD"
 SLOT="0/${PV}"
-KEYWORDS="~amd64 ~x86 ~x86-macos"
+KEYWORDS="amd64 x86 ~x86-macos"
 IUSE=""
 
 RDEPEND="dev-haskell/bytestring-builder:=[profile?]

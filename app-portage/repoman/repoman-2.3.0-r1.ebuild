@@ -1,4 +1,4 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=5
@@ -16,7 +16,7 @@ DESCRIPTION="Repoman is a Quality Assurance tool for Gentoo ebuilds"
 HOMEPAGE="https://wiki.gentoo.org/wiki/Project:Portage"
 
 LICENSE="GPL-2"
-KEYWORDS="alpha amd64 arm arm64 hppa ia64 m68k ~mips ppc ppc64 s390 sh sparc x86 ~amd64-fbsd ~sparc-fbsd ~x86-fbsd"
+KEYWORDS="alpha amd64 arm arm64 hppa ia64 m68k ~mips ppc ppc64 s390 sh sparc x86 ~amd64-fbsd ~x86-fbsd"
 SLOT="0"
 IUSE=""
 
@@ -82,13 +82,13 @@ python_install_all() {
 }
 
 pkg_postinst() {
-	einfo ""
-	einfo "This release of repoman is from the new portage/repoman split"
-	einfo "release code base."
-	einfo "This new repoman code base is still being developed.  So its API's"
-	einfo "are not to be considered stable and are subject to change."
-	einfo "The code released has been tested and considered ready for use."
-	einfo "This however does not guarantee it to be completely bug free."
-	einfo "Please report any bugs you may encounter."
-	einfo ""
+	elog ""
+	elog "This release of repoman is from the new portage/repoman split"
+	elog "release code base."
+	elog "This new repoman code base is still being developed.  So its API's"
+	elog "are not to be considered stable and are subject to change."
+	elog "The code released has been tested and considered ready for use."
+	elog "This however does not guarantee it to be completely bug free."
+	elog "Please report any bugs you may encounter."
+	elog ""
 }

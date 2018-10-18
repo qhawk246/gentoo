@@ -1,4 +1,4 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -23,8 +23,8 @@ SRC_URI="https://github.com/xbmc/libdvdcss/archive/${LIBDVDCSS_COMMIT}.tar.gz ->
 	https://github.com/xbmc/libdvdnav/archive/${LIBDVDNAV_COMMIT}.tar.gz -> libdvdnav-${LIBDVDNAV_COMMIT}.tar.gz
 	!system-ffmpeg? ( https://github.com/xbmc/FFmpeg/archive/${FFMPEG_VERSION}-${CODENAME}.tar.gz -> ffmpeg-${PN}-${FFMPEG_VERSION}-${CODENAME}.tar.gz )"
 
-DESCRIPTION="Kodi is a free and open source media-player and entertainment hub"
-HOMEPAGE="https://kodi.tv/ http://kodi.wiki/"
+DESCRIPTION="A free and open source media-player and entertainment hub"
+HOMEPAGE="https://kodi.tv/ https://kodi.wiki/"
 
 LICENSE="GPL-2"
 SLOT="0"
@@ -147,7 +147,7 @@ case ${PV} in
 	MY_P="${PN}-${MY_PV}"
 	SRC_URI+=" https://github.com/xbmc/xbmc/archive/${MY_PV}-${CODENAME}.tar.gz -> ${MY_P}.tar.gz
 		 !java? ( https://github.com/candrews/gentoo-kodi/raw/master/${MY_P}-generated-addons.tar.xz )"
-	KEYWORDS="amd64 ~x86"
+	KEYWORDS="amd64 x86"
 	IUSE+=" java"
 	DEPEND+="
 		java? ( virtual/jre )
@@ -252,7 +252,12 @@ src_configure() {
 }
 
 src_compile() {
-	cmake-utils_src_compile all $(usev test)
+	cmake-utils_src_compile all
+	use test && emake -C "${BUILD_DIR}" kodi-test
+}
+
+src_test() {
+	emake -C "${BUILD_DIR}" test
 }
 
 src_install() {

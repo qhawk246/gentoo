@@ -1,7 +1,7 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=5
+EAPI=6
 inherit vim-plugin
 
 if [[ ${PV} == 9999 ]]; then
@@ -13,10 +13,16 @@ else
 fi
 
 DESCRIPTION="vim plugin: gitk for vim"
-HOMEPAGE="http://www.vim.org/scripts/script.php?script_id=3574 https://github.com/gregsexton/gitv/"
+HOMEPAGE="https://www.vim.org/scripts/script.php?script_id=3574 https://github.com/gregsexton/gitv/"
 LICENSE="vim"
 
 VIM_PLUGIN_HELPFILES="gitv"
 
 RDEPEND="dev-vcs/git
 	app-vim/fugitive"
+
+src_prepare() {
+	rm -f doc/tags addon-info.json roadmap.md || die
+	rm -r img || die
+	default
+}

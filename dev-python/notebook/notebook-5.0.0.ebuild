@@ -1,4 +1,4 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -14,7 +14,7 @@ SRC_URI="mirror://pypi/${PN:0:1}/${PN}/${P}.tar.gz"
 
 LICENSE="BSD"
 SLOT="0"
-KEYWORDS="~amd64 ~arm64 ~x86"
+KEYWORDS="amd64 ~arm64 x86"
 IUSE="doc test"
 RDEPEND="
 	>=dev-libs/mathjax-2.4
@@ -41,11 +41,12 @@ DEPEND="${RDEPEND}
 	doc? (
 		app-text/pandoc
 		>=dev-python/ipython-4.0.0[${PYTHON_USEDEP}]
-		>=dev-python/sphinx-1.1[${PYTHON_USEDEP}]
+		dev-python/nbsphinx[${PYTHON_USEDEP}]
 	)
 	"
 
-PATCHES=( "${FILESDIR}/${P}"-setupbase.py.patch )
+PATCHES=( "${FILESDIR}/${P}"-setupbase.py.patch
+	"${FILESDIR}/${P}"-example-execution.patch )
 
 python_prepare_all() {
 	sed \

@@ -1,4 +1,4 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -8,15 +8,15 @@ inherit toolchain-funcs python-r1 java-pkg-opt-2 java-ant-2 \
 	cmake-multilib
 
 DESCRIPTION="A collection of algorithms and sample code for various computer vision problems"
-HOMEPAGE="http://opencv.org"
+HOMEPAGE="https://opencv.org"
 
 SRC_URI="https://github.com/${PN}/${PN}/archive/${PV}.tar.gz -> ${P}.tar.gz
 	contrib? ( https://github.com/${PN}/${PN}_contrib/archive/${PV}.tar.gz -> ${P}_contrib.tar.gz
-		contrib_xfeatures2d? ( http://dev.gentoo.org/~amynka/snap/vgg_boostdesc-${PV}.tar.gz ) )"
+		contrib_xfeatures2d? ( https://dev.gentoo.org/~amynka/snap/vgg_boostdesc-${PV}.tar.gz ) )"
 LICENSE="BSD"
 SLOT="0/3.2" # subslot = libopencv* soname version
 KEYWORDS="~amd64 ~arm ~arm64 ~ppc ~ppc64 ~x86 ~amd64-linux"
-IUSE="contrib cuda debug +eigen examples ffmpeg gdal gflags glog gphoto2 gstreamer gtk ieee1394 ipp jpeg jpeg2k lapack libav opencl openexr opengl openmp pch png +python qt5 tesseract testprograms threads tiff vaapi v4l vtk webp xine contrib_cvv contrib_hdf contrib_sfm contrib_xfeatures2d"
+IUSE="contrib cuda debug +eigen examples ffmpeg gdal gflags glog gphoto2 gstreamer gtk ieee1394 jpeg jpeg2k lapack libav opencl openexr opengl openmp pch png +python qt5 tesseract testprograms threads tiff vaapi v4l vtk webp xine contrib_cvv contrib_hdf contrib_sfm contrib_xfeatures2d"
 
 # OpenGL needs gtk or Qt installed to activate, otherwise build system
 # will silently disable it without the user knowing, which defeats the
@@ -63,7 +63,6 @@ RDEPEND="
 		media-libs/libdc1394[${MULTILIB_USEDEP}]
 		sys-libs/libraw1394[${MULTILIB_USEDEP}]
 	)
-	ipp? ( sci-libs/ipp )
 	java? ( >=virtual/jre-1.6:* )
 	jpeg? ( virtual/jpeg:0[${MULTILIB_USEDEP}] )
 	jpeg2k? ( media-libs/jasper:=[${MULTILIB_USEDEP}] )
@@ -94,6 +93,30 @@ DEPEND="${RDEPEND}
 	virtual/pkgconfig[${MULTILIB_USEDEP}]
 	eigen? ( dev-cpp/eigen:3 )
 	java?  ( >=virtual/jdk-1.6 )"
+
+MULTILIB_WRAPPED_HEADERS=(
+	/usr/include/opencv2/cvconfig.h
+	/usr/include/opencv2/opencv_modules.hpp
+	# [contrib_cvv]
+	/usr/include/opencv2/cvv.hpp
+	/usr/include/opencv2/cvv/call_meta_data.hpp
+	/usr/include/opencv2/cvv/cvv.hpp
+	/usr/include/opencv2/cvv/debug_mode.hpp
+	/usr/include/opencv2/cvv/dmatch.hpp
+	/usr/include/opencv2/cvv/filter.hpp
+	/usr/include/opencv2/cvv/final_show.hpp
+	/usr/include/opencv2/cvv/show_image.hpp
+	# [contrib_hdf]
+	/usr/include/opencv2/hdf.hpp
+	/usr/include/opencv2/hdf/hdf5.hpp
+	# [vtk]
+	/usr/include/opencv2/viz.hpp
+	/usr/include/opencv2/viz/types.hpp
+	/usr/include/opencv2/viz/viz3d.hpp
+	/usr/include/opencv2/viz/vizcore.hpp
+	/usr/include/opencv2/viz/widget_accessor.hpp
+	/usr/include/opencv2/viz/widgets.hpp
+)
 
 PATCHES=(
 	"${FILESDIR}/${PN}-3.0.0-gles.patch"
@@ -152,7 +175,7 @@ multilib_src_configure() {
 		-DWITH_GSTREAMER_0_10=OFF	# Don't want this
 		-DWITH_GTK=$(usex gtk)
 		-DWITH_GTK_2_X=$(usex gtk)
-		-DWITH_IPP=$(multilib_native_usex ipp)
+		-DWITH_IPP=OFF
 		-DWITH_JASPER=$(usex jpeg2k)
 		-DWITH_JPEG=$(usex jpeg)
 		-DWITH_WEBP=$(usex webp)

@@ -7,5 +7,6 @@
 	</maintainer>
 	<upstream>
 		<remote-id type="google-code">libhangul</remote-id>
+		<remote-id type="github">libhangul/libhangul</remote-id>
 	</upstream>
 </pkgmetadata>

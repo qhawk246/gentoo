@@ -1,17 +1,17 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
 VALA_USE_DEPEND="vapigen"
 
-inherit mono-env gnome2 vala
+inherit mono-env gnome2 vala flag-o-matic
 
 DESCRIPTION="Utilities for creating and parsing messages using MIME"
 HOMEPAGE="http://spruce.sourceforge.net/gmime/ https://developer.gnome.org/gmime/stable/"
 
 SLOT="2.6"
 LICENSE="LGPL-2.1"
-KEYWORDS="alpha amd64 arm ~arm64 hppa ia64 ppc ppc64 sparc x86 ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x86-macos ~x86-solaris"
+KEYWORDS="alpha amd64 arm ~arm64 ~hppa ia64 ppc ppc64 sparc x86 ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x86-macos ~x64-solaris ~x86-solaris"
 IUSE="doc mono smime static-libs test vala"
 
 RDEPEND="
@@ -44,6 +44,7 @@ src_prepare() {
 }
 
 src_configure() {
+	[[ ${CHOST} == *-solaris* ]] && append-libs iconv
 	gnome2_src_configure \
 		--enable-cryptography \
 		--disable-strict-parser \

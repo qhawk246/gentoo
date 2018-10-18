@@ -1,4 +1,4 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -14,7 +14,7 @@ LICENSE="LGPL-2.1"
 SLOT="0"
 
 [[ ${PV} == 9999 ]] || \
-KEYWORDS="~amd64 ~arm ~x86"
+KEYWORDS="~amd64 ~arm ~arm64 ~x86"
 
 IUSE="doc static-libs tools"
 
@@ -38,7 +38,6 @@ src_configure() {
 	econf \
 		--enable-zip \
 		--disable-werror \
-		--with-sharedptr=c++11 \
 		$(use_with doc docs) \
 		$(use_enable static-libs static) \
 		$(use_enable tools)

@@ -1,9 +1,9 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
 GNOME2_LA_PUNT="yes"
-PYTHON_COMPAT=( python{3_4,3_5} )
+PYTHON_COMPAT=( python{3_4,3_5,3_6,3_7} )
 
 inherit autotools eutils gnome2 multilib python-single-r1 virtualx
 
@@ -14,7 +14,7 @@ LICENSE="LGPL-2+"
 SLOT="0"
 KEYWORDS="~alpha amd64 ~arm ~arm64 ~ia64 ~ppc ~ppc64 ~sparc x86 ~amd64-fbsd ~amd64-linux ~x86-linux"
 
-IUSE="+gtk glade jit lua +python"
+IUSE="+gtk glade lua luajit +python"
 REQUIRED_USE="python? ( ${PYTHON_REQUIRED_USE} )"
 
 RDEPEND="
@@ -24,13 +24,14 @@ RDEPEND="
 	gtk? ( >=x11-libs/gtk+-3:3[introspection] )
 	lua? (
 		>=dev-lua/lgi-0.9.0
-		jit? ( >=dev-lang/luajit-2:2 )
-		!jit? ( =dev-lang/lua-5.1*:0 ) )
+		luajit? ( >=dev-lang/luajit-2:2 )
+		!luajit? ( =dev-lang/lua-5.1*:0 ) )
 	python? (
 		${PYTHON_DEPS}
 		>=dev-python/pygobject-3.2:3[${PYTHON_USEDEP}] )
 "
 DEPEND="${RDEPEND}
+	dev-util/glib-utils
 	>=dev-util/gtk-doc-am-1.11
 	>=dev-util/intltool-0.40
 	virtual/pkgconfig
@@ -65,7 +66,7 @@ src_configure() {
 
 		# lua
 		$(use_enable lua lua5.1)
-		$(use_enable $(usex jit lua jit) luajit)
+		$(use_enable $(usex luajit lua luajit) luajit)
 	)
 
 	gnome2_src_configure "${myconf[@]}"

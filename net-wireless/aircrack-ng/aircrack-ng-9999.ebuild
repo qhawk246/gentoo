@@ -1,43 +1,43 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI="6"
+EAPI=7
 
 PYTHON_COMPAT=( python2_7 )
 DISTUTILS_OPTIONAL=1
 
-inherit toolchain-funcs distutils-r1 flag-o-matic
+inherit toolchain-funcs distutils-r1 flag-o-matic autotools
 
 DESCRIPTION="WLAN tools for breaking 802.11 WEP/WPA keys"
 HOMEPAGE="http://www.aircrack-ng.org"
 
 if [[ ${PV} == "9999" ]] ; then
-	inherit subversion
-	ESVN_REPO_URI="http://svn.aircrack-ng.org/trunk"
+	inherit git-r3
+	EGIT_REPO_URI="https://github.com/aircrack-ng/aircrack-ng.git"
 	KEYWORDS=""
-	S="${WORKDIR}/${PN}"
 else
 	MY_PV=${PV/_/-}
-	SRC_URI="http://download.${PN}.org/${PN}-${MY_PV}.tar.gz"
+	SRC_URI="https://download.aircrack-ng.org/${P}.tar.gz"
 	KEYWORDS="~amd64 ~arm ~ppc ~x86 ~x86-fbsd ~amd64-linux ~x86-linux"
-	S="${WORKDIR}/${PN}-${MY_PV}"
 fi
 
 LICENSE="GPL-2"
 SLOT="0"
 
-IUSE="+airdrop-ng +airgraph-ng kernel_linux kernel_FreeBSD +netlink +pcre +sqlite +experimental"
+IUSE="+airdrop-ng +airgraph-ng kernel_linux kernel_FreeBSD libressl +netlink +pcre +sqlite +experimental"
 
 DEPEND="net-libs/libpcap
-	dev-libs/openssl:0=
+	sys-apps/hwloc
+	!libressl? ( dev-libs/openssl:0= )
+	libressl? ( dev-libs/libressl:0= )
 	netlink? ( dev-libs/libnl:3 )
 	pcre? ( dev-libs/libpcre )
 	airdrop-ng? ( ${PYTHON_DEPS} )
 	airgraph-ng? ( ${PYTHON_DEPS} )
 	experimental? ( sys-libs/zlib )
 	sqlite? ( >=dev-db/sqlite-3.4 )"
-RDEPEND="${DEPEND}
-	kernel_linux? (
+RDEPEND="${DEPEND}"
+PDEPEND="kernel_linux? (
 		net-wireless/iw
 		net-wireless/wireless-tools
 		sys-apps/ethtool
@@ -46,25 +46,24 @@ RDEPEND="${DEPEND}
 	sys-apps/hwids
 	airdrop-ng? ( net-wireless/lorcon[python,${PYTHON_USEDEP}] )"
 
-REQUIRED_USE="airdrop-ng? ( ${PYTHON_REQUIRED_USE} )
-		airgraph-ng? ( ${PYTHON_REQUIRED_USE} )"
+REQUIRED_USE="
+	airdrop-ng? ( ${PYTHON_REQUIRED_USE} )
+	airgraph-ng? ( ${PYTHON_REQUIRED_USE} )"
 
-pkg_setup() {
-	MAKE_COMMON=(
-		CC="$(tc-getCC)" \
-		CXX="$(tc-getCXX)" \
-		AR="$(tc-getAR)" \
-		LD="$(tc-getLD)" \
-		RANLIB="$(tc-getRANLIB)" \
-		libnl=$(usex netlink true false) \
-		pcre=$(usex pcre true false) \
-		sqlite=$(usex sqlite true false) \
-		experimental=$(usex experimental true false)
-		prefix="${ED}/usr" \
-	)
-	[[ ${PV} == "9999" ]] && MAKE_COMMON+=(
-		liveflags=REVFLAGS=-D_REVISION="${ESVN_WC_REVISION}"
-	)
+src_prepare() {
+	default
+	eautoreconf
+}
+
+src_configure() {
+	econf \
+		--disable-asan \
+		--enable-shared \
+		--disable-static \
+		--without-opt \
+		$(use_enable netlink libnl) \
+		$(use_with experimental) \
+		$(use_with sqlite sqlite3)
 }
 
 src_compile() {
@@ -73,7 +72,7 @@ src_compile() {
 		filter-flags -frecord-gcc-switches
 	fi
 
-	emake "${MAKE_COMMON[@]}"
+	default
 
 	if use airgraph-ng; then
 		cd "${S}/scripts/airgraph-ng"
@@ -83,15 +82,10 @@ src_compile() {
 		cd "${S}/scripts/airdrop-ng"
 		distutils-r1_src_compile
 	fi
-}
-
-src_test() {
-	emake "${MAKE_COMMON[@]}" check
 }
 
 src_install() {
-	einstalldocs
-	emake "${MAKE_COMMON[@]}" install
+	default
 
 	if use airgraph-ng; then
 		cd "${S}/scripts/airgraph-ng"
@@ -102,7 +96,7 @@ src_install() {
 		distutils-r1_src_install
 	fi
 
-	#we don't need aircrack-ng's oui updater, we have our own
+	# we don't need aircrack-ng's oui updater, we have our own
 	rm "${ED}"/usr/sbin/airodump-ng-oui-update
 }
 

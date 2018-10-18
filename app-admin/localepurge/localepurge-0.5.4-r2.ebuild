@@ -1,9 +1,9 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=4
+EAPI=6
 
-inherit eutils prefix
+inherit prefix
 
 DESCRIPTION="Script to recover diskspace on unneeded locale files & localized man pages"
 HOMEPAGE="https://gentoo.org
@@ -12,7 +12,7 @@ SRC_URI="https://dev.gentoo.org/~hwoarang/distfiles/${P}.tbz2"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="alpha amd64 arm hppa ia64 ~m68k ~mips ppc ppc64 s390 sh sparc x86 ~x86-fbsd ~amd64-linux ~arm-linux ~x86-linux ~ppc-macos"
+KEYWORDS="alpha amd64 arm hppa ia64 ~m68k ~mips ppc ppc64 s390 sh sparc x86 ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos"
 IUSE=""
 
 DEPEND=""
@@ -20,14 +20,15 @@ RDEPEND="app-shells/bash"
 
 S=${WORKDIR}/${PN}
 
+PATCHES=(
+	"${FILESDIR}"/${PN}-0.5.4-prefix.patch
+	"${FILESDIR}"/${PN}-0.5.4-directorysum.patch # 164544
+	"${FILESDIR}"/${PN}-0.5.4-parentdir.patch #445910
+	"${FILESDIR}"/${PN}-0.5.4-evaltotal.patch #452208
+)
+
 src_prepare() {
-	epatch "${FILESDIR}"/${P}-prefix.patch
-	# 164544
-	epatch "${FILESDIR}"/${P}-directorysum.patch
-	# 445910
-	epatch "${FILESDIR}"/${P}-parentdir.patch
-	 # 452208
-	epatch "${FILESDIR}"/${P}-evaltotal.patch
+	default
 	eprefixify ${PN}
 }
 

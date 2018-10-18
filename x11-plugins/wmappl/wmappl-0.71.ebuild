@@ -1,17 +1,19 @@
-# Copyright 1999-2014 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
+
+EAPI=0
 
 IUSE=""
 DESCRIPTION="Simple application launcher for the Window Maker dock"
 SRC_URI="mirror://sourceforge/${PN}/${P}.tar.gz"
-HOMEPAGE="http://wmappl.sourceforge.net/"
+HOMEPAGE="https://www.dockapps.net/wmappl"
 
 RDEPEND="x11-libs/libX11
 	x11-libs/libXext
 	x11-libs/libXt
 	x11-libs/libXpm"
 DEPEND="${RDEPEND}
-	x11-proto/xextproto"
+	x11-base/xorg-proto"
 
 LICENSE="GPL-2"
 SLOT="0"

@@ -1,8 +1,9 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
-inherit gnome2-utils cmake-utils eutils
+
+inherit cmake-utils desktop gnome2-utils
 
 DESCRIPTION="Modern 3D space shooter with spaceship upgrade possibilities"
 HOMEPAGE="https://sourceforge.net/projects/openastromenace/"
@@ -28,7 +29,7 @@ RDEPEND=${DEPEND}
 S=${WORKDIR}/AstroMenace
 
 src_prepare() {
-	default
+	cmake-utils_src_prepare
 
 	# no messing with CXXFLAGS please.
 	sed -i -e '/-Os/d' CMakeLists.txt || die

@@ -1,19 +1,19 @@
-# Copyright 1999-2016 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 
-EGIT_REPO_URI="git://anongit.freedesktop.org/git/libreoffice/libetonyek"
+EGIT_REPO_URI="https://anongit.freedesktop.org/git/libreoffice/libetonyek.git"
 [[ ${PV} == 9999 ]] && inherit autotools git-r3
 
 DESCRIPTION="Library parsing Apple Keynote presentations"
 HOMEPAGE="https://wiki.documentfoundation.org/DLP/Libraries/libetonyek"
-[[ ${PV} == 9999 ]] || SRC_URI="http://dev-www.libreoffice.org/src/${PN}/${P}.tar.xz"
+[[ ${PV} == 9999 ]] || SRC_URI="https://dev-www.libreoffice.org/src/libetonyek/${P}.tar.xz"
 
 LICENSE="|| ( GPL-2+ LGPL-2.1 MPL-1.1 )"
 SLOT="0"
 [[ ${PV} == 9999 ]] || \
-KEYWORDS="~amd64 ~arm ~x86"
+KEYWORDS="~amd64 ~arm ~arm64 ~ppc64 ~x86"
 IUSE="doc static-libs test"
 
 RDEPEND="
@@ -24,22 +24,13 @@ RDEPEND="
 "
 DEPEND="${RDEPEND}
 	dev-libs/boost
-	>=dev-util/mdds-1.2.2:1
+	>=dev-util/mdds-1.4.2:1=
 	media-libs/glm
 	sys-devel/libtool
 	virtual/pkgconfig
 	doc? ( app-doc/doxygen )
 	test? ( dev-util/cppunit )
 "
-
-pkg_pretend() {
-	if [[ $(gcc-major-version) -lt 4 ]] || {
-		[[ $(gcc-major-version) -eq 4 && $(gcc-minor-version) -lt 8 ]]; }
-	then
-		eerror "Compilation with gcc older than 4.8 is not supported"
-		die "Too old gcc found."
-	fi
-}
 
 src_prepare() {
 	default
@@ -48,12 +39,19 @@ src_prepare() {
 }
 
 src_configure() {
-	econf \
-		--disable-werror \
-		$(use_with doc docs) \
-		$(use_enable static-libs static) \
-		$(use_enable test tests) \
-		--with-mdds=1.2
+	local myeconfargs=(
+		--disable-werror
+		$(use_with doc docs)
+		$(use_enable static-libs static)
+		$(use_enable test tests)
+	)
+	if has_version ">=dev-util/mdds-1.4"; then
+		myeconfargs+=( --with-mdds=1.4 )
+	else
+		myeconfargs+=( --with-mdds=1.2 )
+	fi
+
+	econf "${myeconfargs[@]}"
 }
 
 src_install() {

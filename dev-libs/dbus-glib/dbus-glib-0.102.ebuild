@@ -10,7 +10,7 @@ SRC_URI="https://dbus.freedesktop.org/releases/${PN}/${P}.tar.gz"
 
 LICENSE="|| ( GPL-2 AFL-2.1 )"
 SLOT="0"
-KEYWORDS="alpha amd64 arm ~arm64 hppa ia64 ~mips ppc ppc64 ~s390 ~sh sparc x86 ~amd64-fbsd ~x86-fbsd ~amd64-linux ~arm-linux ~x86-linux ~ppc-macos ~x86-macos ~m68k-mint ~sparc-solaris ~x86-solaris"
+KEYWORDS="alpha amd64 arm ~arm64 hppa ia64 ~mips ppc ppc64 ~s390 ~sh sparc x86 ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x86-macos ~m68k-mint ~sparc-solaris ~x86-solaris"
 IUSE="debug doc static-libs test"
 
 CDEPEND=">=dev-libs/expat-2.1.0-r3[${MULTILIB_USEDEP}]
@@ -19,11 +19,7 @@ CDEPEND=">=dev-libs/expat-2.1.0-r3[${MULTILIB_USEDEP}]
 DEPEND="${CDEPEND}
 	virtual/pkgconfig
 	doc? ( >=dev-util/gtk-doc-1.4 )"
-RDEPEND="${CDEPEND}
-	abi_x86_32? (
-		!<app-emulation/emul-linux-x86-baselibs-20131008-r8
-		!app-emulation/emul-linux-x86-baselibs[-abi_x86_32(-)]
-	)"
+RDEPEND="${CDEPEND}"
 
 DOCS=( AUTHORS ChangeLog HACKING NEWS README )
 

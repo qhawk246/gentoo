@@ -1,9 +1,11 @@
-# Copyright 1999-2016 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
 
-GLIDE_PATCH=3722fc563b737d2d7933df6a771651c2154e6f7b
+inherit autotools desktop flag-o-matic
+
+GLIDE_PATCH=841e1071597b64ead14dd08c25a03206b2d1d1b6
 SRC_URI="glide? ( https://raw.githubusercontent.com/voyageur/openglide/${GLIDE_PATCH}/platform/dosbox/dosbox_glide.diff -> dosbox_glide-${GLIDE_PATCH}.diff )"
 
 if [[ ${PV} = 9999 ]]; then
@@ -13,8 +15,6 @@ else
 	SRC_URI+=" mirror://sourceforge/dosbox/${P}.tar.gz"
 	KEYWORDS="~amd64 ~arm ~ppc64 ~x86"
 fi
-
-inherit autotools eutils flag-o-matic
 
 DESCRIPTION="DOS emulator"
 HOMEPAGE="http://dosbox.sourceforge.net/"
@@ -37,7 +37,9 @@ if [[ ${PV} = 9999 ]]; then
 	S=${WORKDIR}/${PN}
 fi
 
-PATCHES=( "${FILESDIR}/${PN}-0.74-gcc46.patch" )
+PATCHES=(
+	"${FILESDIR}"/${PN}-0.74-gcc46.patch
+)
 
 src_prepare() {
 	use glide && eapply "${DISTDIR}"/dosbox_glide-${GLIDE_PATCH}.diff

@@ -1,4 +1,4 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -11,7 +11,7 @@ SRC_URI="https://github.com/enricoros/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz
 
 LICENSE="GPL-2+"
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="amd64 x86"
 IUSE="opengl webcam"
 
 RDEPEND="
@@ -30,6 +30,8 @@ DEPEND="${RDEPEND}
 
 src_prepare() {
 	default
+
+	eapply "${FILESDIR}/${P}-qt-5.11.patch"
 
 	sed -i -e "s|linux/videodev.h|libv4l1-videodev.h|" \
 		3rdparty/videocapture/VideoDevice.h || die

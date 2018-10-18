@@ -1,7 +1,8 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
+CMAKE_MAKEFILE_GENERATOR=emake
 PYTHON_COMPAT=( python{2_7,3_{4,5,6}} )
 
 inherit cmake-utils python-any-r1
@@ -10,7 +11,7 @@ DESCRIPTION="Encrypted FUSE filesystem that conceals metadata"
 HOMEPAGE="https://www.cryfs.org/"
 
 SLOT=0
-IUSE="test update-check"
+IUSE="libressl test update-check"
 
 LICENSE="LGPL-3 BSD-2 MIT"
 # cryfs - LGPL-3
@@ -20,11 +21,10 @@ LICENSE="LGPL-3 BSD-2 MIT"
 if [[ "${PV}" == 9999 ]] ; then
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/cryfs/cryfs"
-	SRC_URI=""
-	KEYWORDS=""
 else
-	SRC_URI="https://github.com/cryfs/cryfs/releases/download/${PV}/${P}.tar.xz"
-	KEYWORDS="~amd64 ~x86"
+	SRC_URI="https://github.com/cryfs/cryfs/releases/download/${PV}/${P}.tar.xz
+	https://dev.gentoo.org/~johu/distfiles/${P}-spdlog.patch.xz"
+	KEYWORDS="amd64 ~arm x86"
 	S="${WORKDIR}"
 fi
 
@@ -32,18 +32,25 @@ RDEPEND=">=dev-libs/boost-1.56:=
 	>=dev-libs/crypto++-5.6.3:=
 	net-misc/curl:=
 	>=sys-fs/fuse-2.8.6:=
-	dev-libs/openssl:0="
+	!libressl? ( dev-libs/openssl:0= )
+	libressl? ( dev-libs/libressl:= )"
 DEPEND="${RDEPEND}
 	${PYTHON_DEPS}"
 
+PATCHES=( "${WORKDIR}/${P}-spdlog.patch" )
+
+# tests work, but let install fail
+# revisit with 0.9.8 version bump.
+RESTRICT="test"
+
 src_prepare() {
+	cmake-utils_src_prepare
+
 	# remove tests that require internet access to comply with Gentoo policy
 	sed -i -e '/CurlHttpClientTest.cpp/d' -e '/FakeHttpClientTest.cpp/d' test/cpp-utils/CMakeLists.txt || die
 
 	# remove non-applicable warning
 	sed -i -e '/WARNING! This is a debug build. Performance might be slow./d' src/cryfs-cli/Cli.cpp || die
-
-	cmake-utils_src_prepare
 }
 
 src_configure() {

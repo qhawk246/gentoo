@@ -1,4 +1,4 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -27,6 +27,7 @@ REQUIRED_USE="
 RDEPEND="
 	>=app-shells/bash-4:0
 	|| (
+		net-analyzer/openbsd-netcat
 		net-analyzer/netcat6
 		net-analyzer/netcat
 	)
@@ -90,9 +91,16 @@ src_configure() {
 src_install() {
 	default
 
+	rm -rf "${D}/var/cache" || die
+
+	# Remove unneeded .keep files
+	find "${ED}" -name ".keep" -delete || die
+
 	fowners -Rc ${NETDATA_USER}:${NETDATA_GROUP} /var/log/netdata
-	fowners -Rc ${NETDATA_USER}:${NETDATA_GROUP} /var/cache/netdata
+	keepdir /var/log/netdata
 	fowners -Rc ${NETDATA_USER}:${NETDATA_GROUP} /var/lib/netdata
+	keepdir /var/lib/netdata
+	keepdir /var/lib/netdata/registry
 
 	fowners -Rc root:${NETDATA_GROUP} /usr/share/${PN}
 

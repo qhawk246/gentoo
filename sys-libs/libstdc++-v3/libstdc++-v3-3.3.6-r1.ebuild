@@ -1,5 +1,7 @@
-# Copyright 1999-2015 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
+
+EAPI=0
 
 inherit eutils flag-o-matic libtool multilib
 
@@ -16,6 +18,8 @@ transform_known_flags() {
 	replace-cpu-flags G3 750
 	replace-cpu-flags G4 7400
 	replace-cpu-flags G5 7400
+
+	filter-flags -fdiagnostics-show-option
 }
 
 is_arch_allowed() {
@@ -101,6 +105,7 @@ do_filter_flags() {
 	filter-flags '-W*'
 
 	filter-flags -frecord-gcc-switches
+	filter-flags '-fdiagnostics-color*'
 
 	# ...sure, why not?
 	strip-unsupported-flags
@@ -108,9 +113,9 @@ do_filter_flags() {
 	strip-flags
 }
 
-PATCH_VER="1.9"
+PATCH_VER="1.10"
 
-DESCRIPTION="Compatibility package for running binaries linked against a pre gcc 3.4 libstdc++"
+DESCRIPTION="Compatibility package for binaries linked against a pre gcc 3.4 libstdc++"
 HOMEPAGE="https://gcc.gnu.org/libstdc++/"
 SRC_URI="ftp://gcc.gnu.org/pub/gcc/releases/gcc-${PV}/gcc-${PV}.tar.bz2
 	mirror://gentoo/gcc-${PV}-patches-${PATCH_VER}.tar.bz2"
@@ -129,6 +134,7 @@ src_unpack() {
 	unpack ${A}
 	cd "${S}"
 	EPATCH_SUFFIX="patch" epatch "${WORKDIR}"/patch
+
 	elibtoolize --portage --shallow
 	./contrib/gcc_update --touch
 	mkdir -p "${WORKDIR}"/build

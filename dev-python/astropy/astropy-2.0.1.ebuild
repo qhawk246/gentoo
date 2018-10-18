@@ -1,4 +1,4 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -11,7 +11,7 @@ MYPV=${PV/_/}
 S=${WORKDIR}/${PN}-${MYPV}
 
 DESCRIPTION="Core functionality for performing astrophysics with Python"
-HOMEPAGE="http://astropy.org/"
+HOMEPAGE="https://www.astropy.org/"
 SRC_URI="mirror://pypi/${PN:0:1}/${PN}/${PN}-${MYPV}.tar.gz"
 
 LICENSE="BSD"
@@ -33,7 +33,7 @@ RDEPEND="
 	>=dev-python/numpy-1.10[${PYTHON_USEDEP}]
 	dev-python/objgraph[${PYTHON_USEDEP}]
 	dev-python/pandas[${PYTHON_USEDEP}]
-	dev-python/pillow[${PYTHON_USEDEP},jpeg]
+	dev-python/pillow[${PYTHON_USEDEP},jpeg(+)]
 	dev-python/pytz[${PYTHON_USEDEP}]
 	dev-python/pyyaml[${PYTHON_USEDEP}]
 	dev-python/six[${PYTHON_USEDEP}]

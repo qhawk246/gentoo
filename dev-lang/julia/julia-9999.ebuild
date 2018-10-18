@@ -1,11 +1,11 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
 
 RESTRICT="test"
 
-inherit git-r3 elisp-common eutils multilib pax-utils toolchain-funcs
+inherit git-r3 llvm pax-utils toolchain-funcs
 
 DESCRIPTION="High-performance programming language for technical computing"
 HOMEPAGE="https://julialang.org/"
@@ -15,30 +15,35 @@ EGIT_REPO_URI="https://github.com/JuliaLang/julia.git"
 LICENSE="MIT"
 SLOT="0"
 KEYWORDS=""
-IUSE="emacs"
+IUSE=""
 
 RDEPEND="
-	dev-lang/R:0=
+	>=sys-devel/llvm-6.0.0:=
+	>=sys-devel/clang-6.0.0:="
+
+RDEPEND+="
 	dev-libs/double-conversion:0=
 	dev-libs/gmp:0=
 	dev-libs/libgit2:0=
+	>=dev-libs/libpcre2-10.23:0=[jit]
 	dev-libs/mpfr:0=
 	dev-libs/openspecfun
+	sci-libs/amd:0=
 	sci-libs/arpack:0=
 	sci-libs/camd:0=
+	sci-libs/ccolamd:0=
 	sci-libs/cholmod:0=
+	sci-libs/colamd:0=
 	sci-libs/fftw:3.0=[threads]
 	sci-libs/openlibm:0=
 	sci-libs/spqr:0=
 	sci-libs/umfpack:0=
 	sci-mathematics/glpk:0=
-	>=sys-devel/llvm-3.9:0=
 	>=sys-libs/libunwind-1.1:7=
 	sys-libs/readline:0=
 	sys-libs/zlib:0=
-	>=virtual/blas-1.1
-	virtual/lapack
-	emacs? ( app-emacs/ess )"
+	>=virtual/blas-3.6
+	virtual/lapack"
 
 DEPEND="${RDEPEND}
 	dev-util/patchelf
@@ -49,9 +54,7 @@ PATCHES=(
 )
 
 src_prepare() {
-	epatch "${PATCHES[@]}"
-
-	eapply_user
+	default
 
 	# Sledgehammer:
 	# - respect CFLAGS
@@ -59,8 +62,6 @@ src_prepare() {
 	# - fix BLAS and LAPACK link interface
 
 	sed -i \
-		-e 's|$(JLDOWNLOAD)|${EPREFIX}/bin/true|' \
-		-e 's|git submodule|${EPREFIX}/bin/true|g' \
 		-e "s|GENTOOCFLAGS|${CFLAGS}|g" \
 		-e "s|/usr/include|${EPREFIX%/}/usr/include|g" \
 		deps/Makefile || die
@@ -73,12 +74,8 @@ src_prepare() {
 	liblapack="lib${liblapack#-l}"
 
 	sed -i \
-		-e "s|\(JULIA_EXECUTABLE = \)\(\$(JULIAHOME)/julia\)|\1 LD_LIBRARY_PATH=\$(BUILD)/$(get_libdir) \2|" \
 		-e "s|GENTOOCFLAGS|${CFLAGS}|g" \
-		-e "s|LIBDIR = lib|LIBDIR = $(get_libdir)|" \
-		-e "s|/usr/lib|${EPREFIX}/usr/$(get_libdir)|" \
-		-e "s|/usr/include|${EPREFIX}/usr/include|" \
-		-e "s|\$(BUILD)/lib|\$(BUILD)/$(get_libdir)|" \
+		-e "s|GENTOOLIBDIR|$(get_libdir)|" \
 		-e "s|^JULIA_COMMIT = .*|JULIA_COMMIT = v${PV}|" \
 		-e "s|-lblas|$($(tc-getPKG_CONFIG) --libs blas)|" \
 		-e "s|= libblas|= ${libblas}|" \
@@ -97,31 +94,32 @@ src_prepare() {
 }
 
 src_configure() {
-	# julia does not play well with the system versions of
-	# dsfmt, libuv, pcre2 and utf8proc
+	# julia does not play well with the system versions of dsfmt, libuv,
+	# and utf8proc
+
+	# USE_SYSTEM_LIBM=0 implies using external openlibm
 	cat <<-EOF > Make.user
-		USE_SYSTEM_DSFMT=0
-		USE_SYSTEM_LIBUV=0
-		USE_SYSTEM_PCRE=0
-		USE_SYSTEM_RMATH=0
-		USE_SYSTEM_UTF8PROC=0
-		USE_LLVM_SHLIB=1
-		USE_SYSTEM_ARPACK=1
-		USE_SYSTEM_BLAS=1
-		USE_SYSTEM_FFTW=1
-		USE_SYSTEM_GMP=1
-		USE_SYSTEM_GRISU=1
-		USE_SYSTEM_LAPACK=1
-		USE_SYSTEM_LIBGIT2=1
-		USE_SYSTEM_LIBM=1
-		USE_SYSTEM_LIBUNWIND=1
-		USE_SYSTEM_LLVM=1
-		USE_SYSTEM_MPFR=1
-		USE_SYSTEM_OPENLIBM=1
-		USE_SYSTEM_OPENSPECFUN=1
-		USE_SYSTEM_PATCHELF=1
-		USE_SYSTEM_READLINE=1
-		USE_SYSTEM_SUITESPARSE=1
+		USE_SYSTEM_ARPACK:=1
+		USE_SYSTEM_BLAS:=1
+		USE_SYSTEM_DSFMT:=0
+		USE_SYSTEM_GMP:=1
+		USE_SYSTEM_GRISU:=1
+		USE_SYSTEM_LAPACK:=1
+		USE_SYSTEM_LIBGIT2:=1
+		USE_SYSTEM_LIBM:=0
+		USE_SYSTEM_LIBUNWIND:=1
+		USE_SYSTEM_LIBUV:=0
+		USE_SYSTEM_LLVM:=1
+		USE_LLVM_SHLIB:=1
+		USE_SYSTEM_MPFR:=1
+		USE_SYSTEM_OPENLIBM:=1
+		USE_SYSTEM_OPENSPECFUN:=1
+		USE_SYSTEM_PATCHELF:=1
+		USE_SYSTEM_PCRE:=1
+		USE_SYSTEM_READLINE:=1
+		USE_SYSTEM_RMATH:=0
+		USE_SYSTEM_SUITESPARSE:=1
+		USE_SYSTEM_UTF8PROC:=0
 		USE_SYSTEM_ZLIB=1
 		VERBOSE=1
 		libdir="${EROOT}/usr/$(get_libdir)"
@@ -135,11 +133,24 @@ src_compile() {
 	addpredict /proc/self/mem
 
 	emake cleanall
-	emake julia-release \
-		prefix="/usr" DESTDIR="${D}" CC="$(tc-getCC)" CXX="$(tc-getCXX)"
+
+	# Create symlinks...
+	local libblas="$($(tc-getPKG_CONFIG) --libs-only-l blas)"
+	libblas="${libblas%% *}"
+	libblas="lib${libblas#-l}"
+	local liblapack="$($(tc-getPKG_CONFIG) --libs-only-l lapack)"
+	liblapack="${liblapack%% *}"
+	liblapack="lib${liblapack#-l}"
+	mkdir -p "${S}"/usr/lib/julia || die "mkdir failed"
+	for i in ${libblas}.so ${liblapack}.so libumfpack.so libspqr.so; do
+		ln -s "${EROOT}/usr/$(get_libdir)/${i}" "${S}"/usr/lib/julia/ || die "ln failed"
+	done
+
+	emake VERBOSE=1 julia-release \
+		prefix="${EPREFIX}/usr" DESTDIR="${D}" \
+		CC="$(tc-getCC)" CXX="$(tc-getCXX)"
 	pax-mark m $(file usr/bin/julia-* | awk -F : '/ELF/ {print $1}')
 	emake
-	use emacs && elisp-compile contrib/julia-mode.el
 }
 
 src_test() {
@@ -148,34 +159,18 @@ src_test() {
 
 src_install() {
 	emake install \
-		prefix="/usr" DESTDIR="${D}" CC="$(tc-getCC)" CXX="$(tc-getCXX)"
+		prefix="${EPREFIX}/usr" DESTDIR="${D}" \
+		CC="$(tc-getCC)" CXX="$(tc-getCXX)"
 	cat > 99julia <<-EOF
 		LDPATH=${EROOT%/}/usr/$(get_libdir)/julia
 	EOF
 	doenvd 99julia
 
-	if use emacs; then
-		elisp-install "${PN}" contrib/julia-mode.el
-		elisp-site-file-install "${FILESDIR}"/63julia-gentoo.el
-	fi
 	dodoc README.md
 
 	mv "${ED}"/usr/etc/julia "${ED}"/etc || die
 	rmdir "${ED}"/usr/etc || die
-	rmdir "${ED}"/usr/libexec || die
 	mv "${ED}"/usr/share/doc/julia/{examples,html} \
-		"${ED}"/usr/share/doc/${P} || die
+		"${ED}"/usr/share/doc/${PF} || die
 	rmdir "${ED}"/usr/share/doc/julia || die
-	if [[ $(get_libdir) != lib ]]; then
-		mkdir -p "${ED}"/usr/$(get_libdir) || die
-		mv "${ED}"/usr/lib/julia "${ED}"/usr/$(get_libdir)/julia || die
-	fi
-}
-
-pkg_postinst() {
-	use emacs && elisp-site-regen
-}
-
-pkg_postrm() {
-	use emacs && elisp-site-regen
 }

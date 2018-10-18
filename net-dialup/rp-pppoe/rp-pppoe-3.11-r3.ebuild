@@ -1,4 +1,4 @@
-# Copyright 1999-2016 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=5
@@ -10,7 +10,7 @@ PPP_P="ppp-2.4.7"
 DESCRIPTION="A user-mode PPPoE client and server suite for Linux"
 HOMEPAGE="https://www.roaringpenguin.com/products/pppoe"
 SRC_URI="http://www.roaringpenguin.com/files/download/${P}.tar.gz
-	ftp://ftp.samba.org/pub/ppp/${PPP_P}.tar.gz"
+	https://www.samba.org/ftp/pub/ppp/${PPP_P}.tar.gz"
 
 LICENSE="GPL-2"
 SLOT="0"
@@ -21,8 +21,7 @@ RDEPEND="
 	net-dialup/ppp:=
 	tk? ( dev-lang/tk )
 "
-# see bug #230491
-DEPEND="|| ( <sys-kernel/linux-headers-2.6.24 >=sys-kernel/linux-headers-2.6.25 )
+DEPEND=">=sys-kernel/linux-headers-2.6.25
 	${RDEPEND}"
 
 DOC_CONTENTS="Use pppoe-setup to configure your dialup connection"

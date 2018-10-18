@@ -1,11 +1,11 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
 
 PYTHON_COMPAT=( python2_7 )
 
-inherit autotools java-pkg-opt-2 python-single-r1
+inherit autotools flag-o-matic java-pkg-opt-2 python-single-r1
 
 DESCRIPTION="General-purpose cryptography library"
 HOMEPAGE="https://sourceforge.net/projects/beecrypt/"
@@ -13,7 +13,7 @@ SRC_URI="mirror://sourceforge/beecrypt/${P}.tar.gz"
 
 LICENSE="GPL-2 LGPL-2"
 SLOT="0"
-KEYWORDS="alpha amd64 arm hppa ~ia64 ppc ppc64 ~s390 ~sh ~sparc x86 ~x86-fbsd ~amd64-linux ~arm-linux ~x86-linux ~ppc-macos"
+KEYWORDS="alpha amd64 arm hppa ~ia64 ppc ppc64 ~s390 ~sh ~sparc x86 ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos"
 IUSE="+threads java cxx python static-libs doc"
 REQUIRED_USE="cxx? ( threads )
 	python? ( ${PYTHON_REQUIRED_USE} )"
@@ -38,11 +38,12 @@ PATCHES=(
 
 	# Fixes bug 596904
 	"${FILESDIR}"/${P}-c++11-allow-throw-in-destructors.patch
+	"${FILESDIR}"/${P}-cast-uchar.patch #618676
 )
 
 pkg_setup() {
 	use python && python-single-r1_pkg_setup
-	use java && java-pkg-opt-2_pkg_setup
+	java-pkg-opt-2_pkg_setup
 }
 
 src_prepare() {
@@ -51,7 +52,12 @@ src_prepare() {
 }
 
 src_configure() {
+	# ICU needs char16_t support now
+	# bug 649548
+	append-cxxflags -std=c++14
+
 	# cplusplus needs threads support
+	ac_cv_java_include=$(use java && java-pkg_get-jni-cflags) \
 	econf \
 		--disable-expert-mode \
 		$(use_enable static-libs static) \

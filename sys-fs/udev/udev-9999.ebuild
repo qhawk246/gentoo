@@ -1,4 +1,4 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -9,14 +9,8 @@ if [[ ${PV} = 9999* ]]; then
 	EGIT_REPO_URI="https://github.com/systemd/systemd.git"
 	inherit git-r3
 else
-	patchset=
 	SRC_URI="https://github.com/systemd/systemd/archive/v${PV}.tar.gz -> systemd-${PV}.tar.gz"
-	if [[ -n "${patchset}" ]]; then
-		SRC_URI+="
-			https://dev.gentoo.org/~williamh/dist/${P}-patches-${patchset}.tar.xz
-			https://dev.gentoo.org/~ssuominen/${P}-patches-${patchset}.tar.xz"
-	fi
-	KEYWORDS="~amd64 ~x86"
+	KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86"
 fi
 
 DESCRIPTION="Linux dynamic and persistent device naming support (aka userspace devfs)"
@@ -28,18 +22,14 @@ IUSE="acl +kmod selinux"
 
 RESTRICT="test"
 
-COMMON_DEPEND=">=sys-apps/util-linux-2.27.1[${MULTILIB_USEDEP}]
+COMMON_DEPEND=">=sys-apps/util-linux-2.30[${MULTILIB_USEDEP}]
 	sys-libs/libcap[${MULTILIB_USEDEP}]
 	acl? ( sys-apps/acl )
 	kmod? ( >=sys-apps/kmod-16 )
 	selinux? ( >=sys-libs/libselinux-2.1.9 )
 	!<sys-libs/glibc-2.11
 	!sys-apps/gentoo-systemd-integration
-	!sys-apps/systemd
-	abi_x86_32? (
-		!<=app-emulation/emul-linux-x86-baselibs-20130224-r7
-		!app-emulation/emul-linux-x86-baselibs[-abi_x86_32(-)]
-	)"
+	!sys-apps/systemd"
 DEPEND="${COMMON_DEPEND}
 	dev-util/gperf
 	>=dev-util/intltool-0.50
@@ -84,35 +74,17 @@ pkg_setup() {
 }
 
 src_prepare() {
-	if ! [[ ${PV} = 9999* ]]; then
-		# secure_getenv() disable for non-glibc systems wrt bug #443030
-		if ! [[ $(grep -r secure_getenv * | wc -l) -eq 27 ]]; then
-			eerror "The line count for secure_getenv() failed, see bug #443030"
-			die
-		fi
-	fi
-
-	# backport some patches
-	if [[ -n "${patchset}" ]]; then
-		eapply "${WORKDIR}"/patch
-	fi
-
 	cat <<-EOF > "${T}"/40-gentoo.rules
 	# Gentoo specific floppy and usb groups
 	ACTION=="add", SUBSYSTEM=="block", KERNEL=="fd[0-9]", GROUP="floppy"
 	ACTION=="add", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", GROUP="usb"
 	EOF
 
-	# change rules back to group uucp instead of dialout for now wrt #454556
-	sed -i -e 's/GROUP="dialout"/GROUP="uucp"/' rules/*.rules || die
+	local PATCHES=(
+		"${FILESDIR}/236-uucp-group.patch"
+	)
 
-	# apply user patches
-	eapply_user
-
-	if ! use elibc_glibc; then #443030
-		echo '#define secure_getenv(x) NULL' >> config.h.in
-		sed -i -e '/error.*secure_getenv/s:.*:#define secure_getenv(x) NULL:' src/shared/missing.h || die
-	fi
+	default
 }
 
 meson_multilib_native_use() {
@@ -131,6 +103,16 @@ multilib_src_configure() {
 		-Dselinux=$(meson_multilib_native_use selinux)
 		-Dlink-udev-shared=false
 		-Dsplit-usr=true
+
+		# Prevent automagic deps
+		-Dgcrypt=false
+		-Dlibcryptsetup=false
+		-Dlibidn=false
+		-Dlibidn2=false
+		-Dlibiptc=false
+		-Dseccomp=false
+		-Dlz4=false
+		-Dxz=false
 	)
 	meson_src_configure
 }
@@ -143,10 +125,10 @@ src_configure() {
 
 multilib_src_compile() {
 	# meson creates this link
-	local libudev=$(readlink src/libudev/libudev.so.1)
+	local libudev=$(readlink src/udev/libudev.so.1)
 
 	local targets=(
-		src/libudev/${libudev}
+		src/udev/${libudev}
 	)
 	if multilib_is_native_abi; then
 		targets+=(
@@ -170,10 +152,10 @@ multilib_src_compile() {
 }
 
 multilib_src_install() {
-	local libudev=$(readlink src/libudev/libudev.so.1)
+	local libudev=$(readlink src/udev/libudev.so.1)
 
 	into /
-	dolib.so src/libudev/{${libudev},libudev.so.1,libudev.so}
+	dolib.so src/udev/{${libudev},libudev.so.1,libudev.so}
 
 	insinto "/usr/$(get_libdir)/pkgconfig"
 	doins src/libudev/libudev.pc
@@ -206,6 +188,7 @@ multilib_src_install_all() {
 
 	insinto /etc/udev
 	doins src/udev/udev.conf
+	keepdir /etc/udev/{hwdb.d,rules.d}
 
 	insinto /lib/systemd/network
 	doins network/99-default.link

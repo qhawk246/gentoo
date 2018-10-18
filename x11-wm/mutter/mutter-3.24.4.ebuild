@@ -1,4 +1,4 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -12,7 +12,7 @@ SLOT="0/0"
 
 IUSE="debug gles2 input_devices_wacom +introspection test udev wayland"
 
-KEYWORDS="~alpha ~amd64 ~arm ~ia64 ~ppc ~ppc64 ~sparc ~x86"
+KEYWORDS="~alpha amd64 ~arm ~ia64 ~ppc ~ppc64 ~sparc x86"
 
 # libXi-1.7.4 or newer needed per:
 # https://bugzilla.gnome.org/show_bug.cgi?id=738944
@@ -54,31 +54,37 @@ COMMON_DEPEND="
 	gles2? ( media-libs/mesa[gles2] )
 	input_devices_wacom? ( >=dev-libs/libwacom-0.13 )
 	introspection? ( >=dev-libs/gobject-introspection-1.42:= )
-	udev? ( virtual/libgudev:= )
+	udev? ( >=virtual/libgudev-232:= )
 	wayland? (
 		>=dev-libs/libinput-1.4
 		>=dev-libs/wayland-1.6.90
 		>=dev-libs/wayland-protocols-1.7
 		>=media-libs/mesa-10.3[egl,gbm,wayland]
 		sys-apps/systemd
-		virtual/libgudev:=
+		>=virtual/libgudev-232:=
 		>=virtual/libudev-136:=
 		x11-base/xorg-server[wayland]
 		x11-libs/libdrm:=
 	)
 "
 DEPEND="${COMMON_DEPEND}
+	dev-util/glib-utils
 	>=sys-devel/gettext-0.19.6
 	virtual/pkgconfig
-	x11-proto/xextproto
-	x11-proto/xineramaproto
-	x11-proto/xproto
+	x11-base/xorg-proto
 	test? ( app-text/docbook-xml-dtd:4.5 )
 	wayland? ( >=sys-kernel/linux-headers-4.4 )
 "
 RDEPEND="${COMMON_DEPEND}
 	!x11-misc/expocity
 "
+
+PATCHES=(
+	# Fix build with >=gudev-232, bug #630312
+	"${FILESDIR}"/3.24.4-gudev-232.patch
+	# Fix build with USE=debug, bug #645412
+	"${FILESDIR}"/3.24.4-build-debug.patch
+)
 
 src_prepare() {
 	# Disable building of noinst_PROGRAM for tests

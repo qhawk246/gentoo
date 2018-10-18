@@ -1,12 +1,12 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
 inherit git-r3 savedconfig toolchain-funcs
 
 DESCRIPTION="a simple web browser based on WebKit/GTK+"
-HOMEPAGE="http://surf.suckless.org/"
-EGIT_REPO_URI="git://git.suckless.org/surf"
+HOMEPAGE="https://surf.suckless.org/"
+EGIT_REPO_URI="https://git.suckless.org/surf"
 EGIT_BRANCH="surf-webkit2"
 
 LICENSE="MIT"
@@ -14,7 +14,7 @@ SLOT="0"
 KEYWORDS=""
 
 COMMON_DEPEND="
-	app-crypt/gcr
+	app-crypt/gcr[gtk]
 	dev-libs/glib:2
 	net-libs/libsoup
 	net-libs/webkit-gtk:4
@@ -28,10 +28,10 @@ DEPEND="
 RDEPEND="
 	!sci-chemistry/surf
 	${COMMON_DEPEND}
-	x11-apps/xprop
-	x11-misc/dmenu
 	!savedconfig? (
+		>=x11-misc/dmenu-4.7
 		net-misc/curl
+		x11-apps/xprop
 		x11-terms/st
 	)
 "

@@ -1,16 +1,16 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
 inherit eutils gnome2-utils multilib pax-utils versionator xdg-utils
 
 DESCRIPTION="A fast and secure web browser and Internet suite"
-HOMEPAGE="http://www.opera.com/"
+HOMEPAGE="https://www.opera.com/"
 
 SLOT="0"
 LICENSE="OPERA-12 LGPL-2 LGPL-3"
 KEYWORDS="amd64 x86 ~amd64-fbsd ~x86-fbsd"
-IUSE="elibc_FreeBSD gtk kde +gstreamer multilib"
+IUSE="elibc_FreeBSD gtk multilib"
 
 O_V="$(get_version_component_range 1-2)" # Version, i.e. 11.00
 O_B="$(get_version_component_range 3)"   # Build number, i.e. 1156
@@ -21,19 +21,19 @@ O_B="$(get_version_component_range 3)"   # Build number, i.e. 1156
 O_K="noserch" # The key to the snapshot URL
 
 O_LINGUAS="
-	af ar az be bg bn cs da de el en-GB es-ES es-LA et fa fi fr fr-CA fy gd he
-	hi hr hu id it ja ka kk ko lt lv me mk ms nb nl nn pa pl pt pt-BR ro ru sk
-	sr sv sw ta te th tl tr uk ur uz vi zh-CN zh-TW zu
+	af ar az be bg bn cnr cs da de el en-GB es-419 es-ES et fa fi fr fr-CA fy
+	gd he hi hr hu id it ja ka kk ko lt lv mk ms nb nl nn pa pl pt pt-BR ro ru
+	sk sr sv sw ta te th tl tr uk ur uz vi zh-CN zh-TW zu
 " # Supported linguas
 
 # == End of variables that often change ==
 
 if [[ "pre${O_B/pre/}" = "${O_B}" ]]; then	# snapshot: _pre
-	HOMEPAGE="http://my.opera.com/desktopteam/blog/"
+	HOMEPAGE="https://my.opera.com/desktopteam/blog/"
 
 	O_D="${O_K}_${O_V}-${O_B/pre}"			# directory string
 	O_P="${PN}-${O_V}-${O_B/pre}"			# package string
-	O_U="http://snapshot.opera.com/unix/"	# base URI
+	O_U="https://snapshot.opera.com/unix/"	# base URI
 
 	SRC_URI="
 		amd64? ( ${O_U}${O_D}/${O_P}.x86_64.linux.tar.xz )
@@ -55,7 +55,7 @@ else							# release: _p
 fi
 
 for O_LINGUA in ${O_LINGUAS}; do
-	IUSE+=" linguas_${O_LINGUA/-/_}"
+	IUSE+=" l10n_${O_LINGUA}"
 done
 
 DEPEND="
@@ -71,18 +71,6 @@ GTKRDEPEND="
 	x11-libs/pango
 	x11-libs/pixman
 "
-KDERDEPEND="
-	kde-frameworks/kdelibs:4
-	dev-qt/qtcore:4
-	dev-qt/qtgui:4
-"
-GSTRDEPEND="
-	dev-libs/glib:2
-	dev-libs/libxml2
-	media-libs/gst-plugins-base:0.10
-	media-libs/gstreamer:0.10
-	media-plugins/gst-plugins-meta:0.10
-"
 RDEPEND="
 	media-libs/fontconfig
 	media-libs/freetype
@@ -97,8 +85,6 @@ RDEPEND="
 	x11-libs/libXt
 	x11-misc/xdg-utils
 	gtk? ( ${GTKRDEPEND} )
-	kde? ( ${KDERDEPEND} )
-	gstreamer? ( ${GSTRDEPEND} )
 "
 
 QA_PREBUILT="*"
@@ -127,7 +113,12 @@ src_prepare() {
 
 	# Remove unwanted linguas
 	for LINGUA in ${O_LINGUAS}; do
-		if ! use linguas_${LINGUA/-/_}; then
+		if ! use l10n_${LINGUA}; then
+			# Remap codes for Montenegrin and Spanish (Latin America)
+			case ${LINGUA} in
+				cnr) LINGUA=me ;;
+				es-419) LINGUA=es-LA ;;
+			esac
 			LINGUA=$(find "${LNGDIR}" -maxdepth 1 -type d -iname ${LINGUA/_/-})
 			rm -r "${LINGUA}" || die "The list of linguas needs to be fixed"
 		fi
@@ -145,16 +136,15 @@ src_prepare() {
 	# Remove package directory
 	rm -rf share/${PN}/package
 
+	rm -r lib/${PN}/gstreamer || die
+
 	# Optional libraries
 	if ! use gtk; then
 		rm lib/${PN}/liboperagtk2.so || die
 	fi
-	if ! use kde; then
-		rm lib/${PN}/liboperakde4.so || die
-	fi
-	if ! use gstreamer; then
-		rm -r lib/${PN}/gstreamer || die
-	fi
+
+	rm lib/${PN}/liboperakde4.so || die
+
 	if use amd64 && ! use multilib; then
 		rm lib/${PN}/pluginwrapper/operapluginwrapper-ia32-linux || die
 	fi

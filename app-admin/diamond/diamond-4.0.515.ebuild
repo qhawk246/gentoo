@@ -9,7 +9,7 @@ if [[ ${PV} = 9999* ]]; then
 	S=${WORKDIR}/diamond-${PV}
 else
 	SRC_URI="https://github.com/python-diamond/Diamond/archive/v${PV}.tar.gz -> python-diamond-${PV}.tar.gz"
-	KEYWORDS="~amd64 ~x86 ~amd64-linux ~ppc-macos ~x64-macos ~x86-macos ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris"
+	KEYWORDS="~amd64 ~arm ~x86 ~amd64-linux ~ppc-macos ~x64-macos ~x86-macos ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris"
 	S=${WORKDIR}/Diamond-${PV}
 fi
 
@@ -32,7 +32,10 @@ RDEPEND="dev-python/configobj
 	redis? ( dev-python/redis-py )
 	!kernel_linux? ( >=dev-python/psutil-3 )"
 DEPEND="${RDEPEND}
-	test? ( dev-python/mock )"
+	test? (
+		dev-python/mock
+		dev-python/pysnmp
+	)"
 
 src_prepare() {
 	# adjust for Prefix
@@ -48,6 +51,10 @@ src_prepare() {
 }
 
 python_test() {
+	# don't want to depend on docker for just this
+	mv src/collectors/docker_collector/test/{test,no}docker_collector.py || die
+	# fails on binding ports
+	mv src/collectors/portstat/tests/{test,no}_portstat.py || die
 	"${PYTHON}" ./test.py || die "Tests fail with ${PYTHON}"
 }
 

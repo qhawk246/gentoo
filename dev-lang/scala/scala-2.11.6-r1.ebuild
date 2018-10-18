@@ -1,4 +1,4 @@
-# Copyright 1999-2016 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI="5"
@@ -71,14 +71,14 @@ COMMON_DEP="dev-java/ant-core:0
 
 DEPEND="${COMMON_DEP}
 	!binary? (
-		|| ( =virtual/jdk-1.7* =virtual/jdk-1.8* )
+		=virtual/jdk-1.8*
 		dev-java/ant-core:0
 		dev-java/ant-contrib:0
 		dev-java/ant-nodeps:0
 		media-gfx/graphviz
 	)
 	binary? (
-		|| ( =virtual/jdk-1.7* =virtual/jdk-1.8* )
+		=virtual/jdk-1.8*
 	)
 	app-arch/xz-utils:0"
 
@@ -129,7 +129,7 @@ java_prepare() {
 			cp -p "${DISTDIR}/${g}" "${S}/${j#${BURI}/*/}" || die
 		done
 		# gentoo patch (by gienah) to stop it calling git log in the build
-		epatch "${FILESDIR}/${P}-no-git.patch"
+		epatch "${FILESDIR}/${PN}-2.11.6-no-git.patch"
 		# Note: to bump scala, some things to try are:
 		# 1. update all the sha1s in JURI
 		# 2. remove the https://dev.gentoo.org/~gienah/snapshots/${P}-maven-deps.tar.gz from SRC_URI

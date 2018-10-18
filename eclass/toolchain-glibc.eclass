@@ -1,9 +1,10 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 # @ECLASS: toolchain-glibc.eclass
 # @MAINTAINER:
 # <toolchain@gentoo.org>
+# @SUPPORTED_EAPIS: 0 1 2 3 4 5 6
 # @BLURB: Common code for sys-libs/glibc ebuilds
 # @DESCRIPTION:
 # This eclass contains the common phase functions migrated from
@@ -19,9 +20,10 @@ case ${EAPI:-0} in
 		src_install pkg_preinst pkg_postinst;;
 	2|3) EXPORT_FUNCTIONS pkg_setup src_unpack src_prepare src_configure \
 		src_compile src_test src_install pkg_preinst pkg_postinst;;
-	4|5|6) EXPORT_FUNCTIONS pkg_pretend pkg_setup src_unpack src_prepare \
+	4|5) EXPORT_FUNCTIONS pkg_pretend pkg_setup src_unpack src_prepare \
 		src_configure src_compile src_test src_install \
 		pkg_preinst pkg_postinst;;
+	6) EXPORT_FUNCTIONS pkg_pretend;;
 	*) die "Unsupported EAPI=${EAPI}";;
 esac
 
@@ -119,9 +121,6 @@ setup_target_flags() {
 		mips)
 			# The mips abi cannot support the GNU style hashes. #233233
 			filter-ldflags -Wl,--hash-style=gnu -Wl,--hash-style=both
-		;;
-		ppc)
-			append-flags "-freorder-blocks"
 		;;
 		sparc)
 			# Both sparc and sparc64 can use -fcall-used-g6.  -g7 is bad, though.
@@ -229,6 +228,7 @@ setup_flags() {
 	strip-flags
 	strip-unsupported-flags
 	filter-flags -m32 -m64 -mabi=*
+	filter-ldflags -Wl,-rpath=*
 
 	# Bug 492892.
 	filter-flags -frecord-gcc-switches
@@ -364,11 +364,20 @@ setup_env() {
 		# and fall back on CFLAGS.
 		local VAR=CFLAGS_${CTARGET//[-.]/_}
 		CFLAGS=${!VAR-${CFLAGS}}
+		einfo " $(printf '%15s' 'Manual CFLAGS:')   ${CFLAGS}"
 	fi
 
 	setup_flags
 
 	export ABI=${ABI:-${DEFAULT_ABI:-default}}
+
+	if use headers-only ; then
+		# Avoid mixing host's CC and target's CFLAGS_${ABI}:
+		# At this bootstrap stage we have only binutils for
+		# target but not compiler yet.
+		einfo "Skip CC ABI injection. We can't use (cross-)compiler yet."
+		return 0
+	fi
 
 	local VAR=CFLAGS_${ABI}
 	# We need to export CFLAGS with abi information in them because glibc's
@@ -377,6 +386,7 @@ setup_env() {
 	# top of each other.
 	: ${__GLIBC_CC:=$(tc-getCC ${CTARGET_OPT:-${CTARGET}})}
 	export __GLIBC_CC CC="${__GLIBC_CC} ${!VAR}"
+	einfo " $(printf '%15s' 'Manual CC:')   ${CC}"
 }
 
 foreach_abi() {
@@ -400,7 +410,7 @@ foreach_abi() {
 }
 
 just_headers() {
-	is_crosscompile && use crosscompile_opts_headers-only
+	is_crosscompile && use headers-only
 }
 
 glibc_banner() {
@@ -484,6 +494,12 @@ check_devpts() {
 }
 
 toolchain-glibc_pkg_pretend() {
+	if [[ ${EAPI:-0} == 6 ]]; then
+		eerror "We're moving code back to the ebuilds to get away from the ancient EAPI cruft."
+		eerror "From EAPI=6 on you'll have to define the phases in the glibc ebuilds."
+		die "Silly overlay authors..."
+	fi
+
 	# For older EAPIs, this is run in pkg_preinst.
 	if [[ ${EAPI:-0} != [0123] ]] ; then
 		check_devpts
@@ -588,7 +604,7 @@ eend_KV() {
 
 get_kheader_version() {
 	printf '#include <linux/version.h>\nLINUX_VERSION_CODE\n' | \
-	$(tc-getCPP ${CTARGET}) -I "${EPREFIX}/$(alt_build_headers)" - | \
+	$(tc-getCPP ${CTARGET}) -I "$(alt_build_headers)" - | \
 	tail -n 1
 }
 
@@ -652,16 +668,7 @@ toolchain-glibc_do_src_unpack() {
 	# Check NPTL support _before_ we unpack things to save some time
 	want_nptl && check_nptl_support
 
-	if [[ -n ${EGIT_REPO_URIS} ]] ; then
-		local i d
-		for ((i=0; i<${#EGIT_REPO_URIS[@]}; ++i)) ; do
-			EGIT_REPO_URI=${EGIT_REPO_URIS[$i]}
-			EGIT_SOURCEDIR=${EGIT_SOURCEDIRS[$i]}
-			git-2_src_unpack
-		done
-	else
-		unpack_pkg
-	fi
+	unpack_pkg
 
 	cd "${S}"
 	touch locale/C-translit.h #185476 #218003
@@ -791,8 +798,36 @@ glibc_do_configure() {
 	fi
 
 	if version_is_at_least 2.25 ; then
-		myconf+=( --enable-stack-protector=all )
+		case ${CTARGET} in
+			mips*)
+				# dlopen() detects stack smash on mips n32 ABI.
+				# Cause is unknown: https://bugs.gentoo.org/640130
+				myconf+=( --enable-stack-protector=no )
+				;;
+			powerpc-*)
+				# Currently gcc on powerpc32 generates invalid code for
+				# __builtin_return_address(0) calls. Normally programs
+				# don't do that but malloc hooks in glibc do:
+				# https://gcc.gnu.org/PR81996
+				# https://bugs.gentoo.org/629054
+				myconf+=( --enable-stack-protector=no )
+				;;
+			*)
+				myconf+=( --enable-stack-protector=all )
+				;;
+		esac
 	fi
+
+	# Keep a whitelist of targets supporing IFUNC. glibc's ./configure
+	# is not robust enough to detect proper support:
+	#    https://bugs.gentoo.org/641216
+	#    https://sourceware.org/PR22634#c0
+	case $(tc-arch ${CTARGET}) in
+		# Keep whitelist of targets where autodetection mostly works.
+		amd64|x86|sparc|ppc|ppc64|arm|arm64|s390) ;;
+		# Blacklist everywhere else
+		*) myconf+=( libc_cv_ld_gnu_indirect_function=no ) ;;
+	esac
 
 	if version_is_at_least 2.25 ; then
 		myconf+=( --enable-stackguard-randomization )
@@ -1262,7 +1297,7 @@ toolchain-glibc_do_src_install() {
 	doins "${WORKDIR}"/extra/etc/*.conf || die
 
 	if ! in_iuse nscd || use nscd ; then
-		doinitd "${WORKDIR}"/extra/etc/nscd || die
+		doinitd "$(prefixify_ro "${WORKDIR}"/extra/etc/nscd)" || die
 
 		local nscd_args=(
 			-e "s:@PIDFILE@:$(strings "${ED}"/usr/sbin/nscd | grep nscd.pid):"

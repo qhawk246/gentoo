@@ -1,4 +1,4 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=5
@@ -9,7 +9,7 @@ HOMEPAGE="https://git.gnome.org/browse/libnotify"
 
 LICENSE="LGPL-2.1+"
 SLOT="0"
-KEYWORDS="alpha amd64 arm ~arm64 ia64 ~mips ppc ppc64 ~sh sparc x86 ~amd64-fbsd ~x86-fbsd ~amd64-linux ~arm-linux ~x86-linux ~ppc-macos ~x86-macos ~x86-solaris"
+KEYWORDS="alpha amd64 arm ~arm64 ia64 ~mips ppc ppc64 ~sh sparc x86 ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x86-macos ~x86-solaris"
 IUSE="+introspection test"
 
 RDEPEND="
@@ -20,6 +20,7 @@ RDEPEND="
 "
 DEPEND="${RDEPEND}
 	>=dev-libs/gobject-introspection-common-1.32
+	dev-util/glib-utils
 	>=dev-util/gtk-doc-am-1.14
 	virtual/pkgconfig
 	test? ( x11-libs/gtk+:3[${MULTILIB_USEDEP}] )

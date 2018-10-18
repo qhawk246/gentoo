@@ -1,5 +1,7 @@
-# Copyright 1999-2009 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
+
+EAPI=0
 
 inherit eutils
 
@@ -10,12 +12,11 @@ SRC_URI="http://www.kaoriya.net/dist/var/${P}.tar.bz2"
 LICENSE="cmigemo"
 SLOT="0"
 KEYWORDS="x86 alpha ppc"	# development branch
-IUSE="emacs"
+IUSE=""
 
 DEPEND="app-i18n/qkc
 	app-dicts/migemo-dict"
-RDEPEND="app-dicts/migemo-dict
-	emacs? ( >=app-text/migemo-0.40-r1 )"
+RDEPEND="app-dicts/migemo-dict"
 
 src_unpack() {
 	unpack ${A}
@@ -47,18 +48,4 @@ src_install() {
 
 	dodoc tools/migemo.vim
 	dodoc doc/{README_j,TODO_j,vimigemo}.txt
-}
-
-pkg_postinst() {
-	if use emacs ; then
-		elog
-		elog "Please add to your ~/.emacs"
-		elog "    (setq migemo-command \"cmigemo\")"
-		elog "    (setq migemo-options '(\"-q\" \"--emacs\" \"-i\" \"\\\\a\"))"
-		elog "    (setq migemo-dictionary \"/usr/share/migemo/migemo-dict\")"
-		elog "    (setq migemo-user-dictionary nil)"
-		elog "    (setq migemo-regex-dictionary nil)"
-		elog "to use cmigemo instead of migemo under emacs."
-		elog
-	fi
 }

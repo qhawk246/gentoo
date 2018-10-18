@@ -7,12 +7,12 @@ PYTHON_COMPAT=( python2_7 )
 inherit distutils-r1
 
 DESCRIPTION="Gertty is a console-based interface to the Gerrit Code Review system."
-HOMEPAGE="https://pypi.python.org/pypi/gertty"
+HOMEPAGE="https://pypi.org/project/gertty/"
 SRC_URI="mirror://pypi/${PN:0:1}/${PN}/${P}.tar.gz"
 
 LICENSE="Apache-2.0"
 SLOT="0"
-KEYWORDS="~amd64 ~x86 ~amd64-linux ~x86-linux"
+KEYWORDS="amd64 x86 ~amd64-linux ~x86-linux"
 SLOT="0"
 IUSE=""
 

@@ -6,6 +6,7 @@
 # gnome@gentoo.org
 # @AUTHOR:
 # Alexandre Rostovtsev <tetromino@gentoo.org>
+# @SUPPORTED_EAPIS: 1 2 3 4 5 6 7
 # @BLURB: Sets up the environment for using a specific version of vala.
 # @DESCRIPTION:
 # This eclass sets up commonly used environment variables for using a specific
@@ -31,7 +32,7 @@ VALA_MIN_API_VERSION=${VALA_MIN_API_VERSION:-0.32}
 # @ECLASS-VARIABLE: VALA_MAX_API_VERSION
 # @DESCRIPTION:
 # Maximum vala API version (e.g. 0.32).
-VALA_MAX_API_VERSION=${VALA_MAX_API_VERSION:-0.34}
+VALA_MAX_API_VERSION=${VALA_MAX_API_VERSION:-0.36}
 
 # @ECLASS-VARIABLE: VALA_USE_DEPEND
 # @DEFAULT_UNSET

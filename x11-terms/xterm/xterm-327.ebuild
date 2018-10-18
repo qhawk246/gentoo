@@ -1,4 +1,4 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=5
@@ -6,12 +6,12 @@ EAPI=5
 inherit eutils flag-o-matic multilib
 
 DESCRIPTION="Terminal Emulator for X Windows"
-HOMEPAGE="http://invisible-island.net/xterm/"
-SRC_URI="ftp://invisible-island.net/${PN}/${P}.tgz"
+HOMEPAGE="https://invisible-island.net/xterm/"
+SRC_URI="ftp://ftp.invisible-island.net/${PN}/${P}.tgz"
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="alpha amd64 arm ~arm64 hppa ia64 ~mips ppc ppc64 ~s390 ~sh sparc x86 ~amd64-fbsd ~x86-fbsd ~amd64-linux ~arm-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris"
+KEYWORDS="alpha amd64 arm ~arm64 hppa ia64 ~mips ppc ppc64 s390 ~sh sparc x86 ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~sparc-solaris ~sparc64-solaris ~x64-solaris ~x86-solaris"
 IUSE="+openpty toolbar truetype unicode Xaw3d xinerama"
 
 COMMON_DEPEND="kernel_linux? ( sys-libs/libutempter )
@@ -33,8 +33,7 @@ RDEPEND="${COMMON_DEPEND}
 	x11-apps/rgb"
 DEPEND="${COMMON_DEPEND}
 	virtual/pkgconfig
-	x11-proto/kbproto
-	x11-proto/xproto"
+	x11-base/xorg-proto"
 
 DOCS=( README{,.i18n} ctlseqs.txt )
 

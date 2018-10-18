@@ -1,5 +1,82 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
+
+# Tobias Klausmann <klausman@gentoo.org> (15 Oct 2018)
+# Mask USE=test for jq since it would require valgrind, which likely never get
+# support on Alpha. Also see bug 583422.
+app-misc/jq test
+
+# Thomas Deutschmann <whissi@gentoo.org> (15 Oct 2018)
+# Requires app-text/mecab which isn't yet keyworded
+# on alpha, bug 668674
+dev-db/mysql cjk
+dev-db/percona-server cjk
+
+# Mikle Kolyada <zlogene@gentoo.org> (05 Oct 2018)
+# Not keyworded (see bug #540540c#8)
+app-admin/sudo sssd
+
+# Andreas Sturmlechner <asturm@gentoo.org> (30 Sep 2018)
+# Optional dependency blocking security cleanup, bug #627316
+media-sound/mpd wildmidi
+
+# Joonas Niilola <juippis@gmail.com> (09 Sep 2018)
+# Optional dependency blocking updates.
+media-plugins/imlib2_loaders eet
+
+# Joonas Niilola <juippis@gmail.com> (17 Jun 2018)
+# Optional dependency not available for this arch
+dev-libs/efl vlc
+
+# Thomas Deutschmann <whissi@gentoo.org> (06 Jun 2018)
+# Needs sys-apps/fakechroot which isn't keyworded
+app-arch/rpm test
+
+# Tomáš Mózes <hydrapolic@gmail.com> (05 Jun 2018)
+# Unkeyworded dependencies.
+app-admin/syslog-ng amqp mongodb
+
+# Thomas Deutschmann <whissi@gentoo.org> (02 Jun 2018)
+# Needs dev-ruby/asciidoctor which has a lot of unstable deps
+net-analyzer/wireshark doc
+
+# Tobias Klausmann <klausman@gentoo.org> (22 Mar 2018)
+# Masked due to missing deps. Some *could* have their deps keyworded,
+# but we're trying to keep the maintenance load low.
+app-metrics/collectd collectd_plugins_amqp
+app-metrics/collectd collectd_plugins_gmond
+app-metrics/collectd collectd_plugins_gps
+app-metrics/collectd collectd_plugins_ipmi
+app-metrics/collectd collectd_plugins_modbus
+app-metrics/collectd collectd_plugins_nut
+app-metrics/collectd collectd_plugins_onewire
+app-metrics/collectd collectd_plugins_oracle
+app-metrics/collectd collectd_plugins_routeros
+app-metrics/collectd collectd_plugins_sigrok
+app-metrics/collectd collectd_plugins_tokyotyrant
+app-metrics/collectd collectd_plugins_varnish
+app-metrics/collectd collectd_plugins_virt
+app-metrics/collectd collectd_plugins_write_kafka
+app-metrics/collectd collectd_plugins_write_mongodb
+app-metrics/collectd collectd_plugins_xencpu
+app-metrics/collectd collectd_plugins_java
+
+# Ulrich Müller <ulm@gentoo.org> (23 Oct 2017)
+# Needs net-mail/mailutils which is not keyworded, bug #635216.
+app-editors/emacs mailutils
+app-editors/emacs-vcs mailutils
+
+# Michael Palimaka <kensington@gentoo.org> (30 Sep 2017)
+# Required dependencies are not keyworded.
+x11-themes/qtcurve plasma
+
+# Brian Evans <grknight@gentoo.org> (21 Aug 2017)
+# No keywords for sys-process/numactl
+dev-db/mariadb numa
+
+# Gilles Dartiguelongue <eva@gentoo.org> (16 Aug 2017)
+# missing keyword on dev-python/dbusmock, bug #620024
+>=gnome-base/gnome-settings-daemon-3.24 test
 
 # Michał Górny <mgorny@gentoo.org> (08 Aug 2017)
 # Required VIDEO_CARDS=i965/radeonsi, both masked in this profile.
@@ -25,10 +102,6 @@ dev-vcs/git pcre-jit
 # Tobias Klausmann <klausman@gentoo.org> (18 May 2017)
 # Stack protector code is not ported to alpha (and may not ever be)
 >=sys-devel/gcc-6 ssp
-
-# Tobias Klausmann <klausman@gentoo.org> (08 May 2017)
-# USE=test requires valgrind, which will never be ported to alpha
-app-misc/jq test
 
 # Tobias Klausmann <klausman@gentoo.org> (02 Mar 2017)
 # libilbc has not been ported to alpha and likely never will be.
@@ -101,10 +174,6 @@ media-video/ffmpeg nvenc openh264
 # Missing test deps keyword #575366
 dev-cpp/eigen test
 
-# Mike Frysinger <vapier@gentoo.org> (21 Feb 2016)
-# Needs arch love for elementary. #575322
-media-libs/elementary javascript
-
 # Tobias Klausmann <klausman@gentoo.org> 04 Feb 2016
 # sys-cluster/ceph is not broken per se, but a maintenance burden.
 net-analyzer/rrdtool rados
@@ -112,10 +181,6 @@ net-analyzer/rrdtool rados
 # James Le Cuirot <chewi@gentoo.org> (30 Jan 2016)
 # scrollview requires Java, which is unsupported on Alpha.
 app-text/tesseract scrollview
-
-# Michael Weber <xmw@gentoo.org> (09 Jan 2016)
-# no alpha support in media-libs/glfw
-app-text/mupdf opengl
 
 # Justin Lecher <jlec@gentoo.org> (18 Nov 2015)
 # requires dev-python/restkit which requires
@@ -167,8 +232,8 @@ dev-python/wsgiproxy2 test
 dev-python/urllib3 test
 
 # Gilles Dartiguelongue <eva@gentoo.org> (09 Jun 2015)
-# dev-lang/luajit and dev-lua/lgi and lack alpha keyword, bug #551540
-dev-libs/libpeas lua jit
+# dev-lua/lgi lacks alpha keyword, bug #551540
+dev-libs/libpeas lua
 
 # Mike Frysinger <vapier@gentoo.org> (16 Mar 2015)
 # Needs sci-physics/bullet tested #499974
@@ -195,7 +260,6 @@ net-misc/networkmanager teamd
 # See bug #533420.
 media-libs/clutter egl wayland
 media-libs/clutter-gtk wayland
-x11-wm/mutter kms
 
 # Mark Wright <gienah@gentoo.org> (14-23 Dec 2014)
 # test dependencies need keywording
@@ -228,10 +292,6 @@ media-video/ffmpeg x265
 # neither dietlibc nor klibc will likely ever build/work on alpha, bug #487672
 >=sys-fs/dmraid-1.0.0_rc16-r3 dietlibc klibc
 
-# Pacho Ramos <pacho@gentoo.org> (15 Mar 2014)
-# Missing keywords, bug #504672
->=net-misc/vinagre-3.10 rdp
-
 # Pacho Ramos <pacho@gentoo.org> (22 Feb 2014)
 # Missing keywords, bug #495250
 >=gnome-base/gnome-extra-apps-3.10 tracker
@@ -260,10 +320,6 @@ dev-haskell/dataenc test
 # dev-python/cython is not keyworded for alpha
 >=app-accessibility/brltty-4.5 python
 
-# Patrick Lauer <patrick@gentoo.org> (17 Jun 2013)
-# Fix per-arch mask of phonon[zeitgeist] #460140
-media-libs/phonon zeitgeist
-
 # Gilles Dartiguelongue <eva@gentoo.org> (1 Apr 2013)
 # missing keyword on media-libs/tremor, bug #453200
 media-libs/gst-plugins-base ivorbis
@@ -274,7 +330,7 @@ media-libs/gst-plugins-base ivorbis
 
 # Alexandre Rostovtsev <tetromino@gentoo.org> (31 Jan 2013)
 # remove mask when net-libs/libqmi is keyworded here
-net-misc/modemmanager qmi qmi-newest
+net-misc/modemmanager qmi
 
 # Alexandre Rostovtsev <tetromino@gentoo.org> (22 Jan 2013)
 # remove mask if/when media-gfx/argyllcms is keywored here.
@@ -303,14 +359,6 @@ gnome-extra/libgda reports
 >=dev-db/mariadb-5.5 tcmalloc
 >=dev-db/percona-server-5.5 tcmalloc
 
-# Raúl Porcel <armin76@gentoo.org> (25 Jun 2012)
-# dev-qt/qtwebkit doesn't seem to work
-dev-python/PyQt4 webkit
-dev-qt/assistant webkit
-dev-qt/designer webkit
-dev-qt/qtdeclarative webkit
-net-irc/kvirc webkit
-
 # Raúl Porcel <armin76@gentoo.org> (28 May 2012)
 # Needs x11-misc/lightdm(which also requires some other deps)
 x11-misc/xscreensaver new-login
@@ -323,10 +371,6 @@ sys-cluster/openmpi openmpi_fabrics_psm openmpi_fabrics_knem openmpi_fabrics_ope
 # libpcre jit is not supported on alpha
 dev-libs/libpcre jit
 
-# Pacho Ramos <pacho@gentoo.org> (24 Oct 2011)
-# Missing keywords in needed packages, bug #388367
-net-im/empathy map
-
 # Raúl Porcel <armin76@gentoo.org> (08 Oct 2011)
 # Needs media-sound/lilypond
 app-text/asciidoc test
@@ -334,10 +378,6 @@ app-text/asciidoc test
 # Patrick McLean <chutzpah@gentoo.org> (07 Sep 2011)
 # missing keywords on dependencies
 media-video/x264-encoder ffmpegsource
-
-# Robin H. Johnson <robbat2@gentoo.org> (03 Sep 2011)
-# Remove this for your arch after you keyword dev-utils/google-perftools (bug #381737)
-dev-libs/libmemcached tcmalloc
 
 # Alexey Shvetsov <alexxy@gentoo.org> (31 Aug 2011)
 # Mask numa use flag per bug #381313
@@ -373,13 +413,9 @@ www-client/seamonkey custom-optimization
 # quesoglc is not keyworded
 x11-misc/rss-glx quesoglc
 
-# Ben de Groot <yngwin@gentoo.org> (16 Jan 2010)
-# qtmultimedia is not keyworded, bug 293671
-dev-python/PyQt4 multimedia
-
 # Raúl Porcel <armin76@gentoo.org> (07 Jul 2008)
 # Make clisp deps minimal
-dev-lisp/clisp hyperspec pari svm
+dev-lisp/clisp hyperspec svm
 
 # Tobias Klausmann <klausman@gentoo.org> (15 Jun 2008)
 # No hardware to test net-dialup/linux-atm on alpha, so mask atm use flag

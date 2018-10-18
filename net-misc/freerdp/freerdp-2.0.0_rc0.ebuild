@@ -10,7 +10,7 @@ if [[ ${PV} != 9999 ]]; then
 	MY_P="FreeRDP-${MY_PV}"
 	S="${WORKDIR}/${MY_P}"
 	SRC_URI="https://github.com/FreeRDP/FreeRDP/archive/${MY_PV}.tar.gz -> ${MY_P}.tar.gz"
-	KEYWORDS="~alpha ~amd64 ~arm ~ppc ~ppc64 ~x86"
+	KEYWORDS="alpha amd64 arm ppc ppc64 x86"
 else
 	inherit git-r3
 	SRC_URI=""
@@ -22,7 +22,7 @@ HOMEPAGE="http://www.freerdp.com/"
 
 LICENSE="Apache-2.0"
 SLOT="0/2"
-IUSE="alsa +client cpu_flags_x86_sse2 cups debug doc ffmpeg gstreamer jpeg libav libressl neon openh264 pulseaudio server smartcard systemd test usb wayland X xinerama xv"
+IUSE="alsa +client cpu_flags_x86_ssse3 cups debug doc ffmpeg gstreamer jpeg libav libressl neon openh264 pulseaudio server smartcard systemd test usb wayland X xinerama xv"
 
 RDEPEND="
 	!libressl? ( dev-libs/openssl:0= )
@@ -89,11 +89,17 @@ DEPEND="${RDEPEND}
 "
 
 DOCS=( README )
-PATCHES=( "${FILESDIR}"/freerdp-Fix-gstreamer-1.0-detection.patch )
+PATCHES=(
+	"${FILESDIR}"/2.0.0-rc0-libressl.patch
+	"${FILESDIR}"/freerdp-Fix-gstreamer-1.0-detection.patch
+)
 
 src_configure() {
 	local mycmakeargs=(
+		-DBUILD_TESTING=$(usex test)
+		-DCHANNEL_URBDRC=$(usex usb)
 		-DWITH_ALSA=$(usex alsa)
+		-DWITH_CCACHE=OFF
 		-DWITH_CLIENT=$(usex client)
 		-DWITH_CUPS=$(usex cups)
 		-DWITH_DEBUG_ALL=$(usex debug)
@@ -107,12 +113,11 @@ src_configure() {
 		-DWITH_SERVER=$(usex server)
 		-DWITH_PCSC=$(usex smartcard)
 		-DWITH_LIBSYSTEMD=$(usex systemd)
-		-DWITH_SSE2=$(usex cpu_flags_x86_sse2)
-		-DCHANNEL_URBDRC=$(usex usb)
+		# WITH_SSE2 actually enables code requiring SSSE3
+		-DWITH_SSE2=$(usex cpu_flags_x86_ssse3)
 		-DWITH_X11=$(usex X)
 		-DWITH_XINERAMA=$(usex xinerama)
 		-DWITH_XV=$(usex xv)
-		-DBUILD_TESTING=$(usex test)
 		-DWITH_WAYLAND=$(usex wayland)
 	)
 	cmake-utils_src_configure

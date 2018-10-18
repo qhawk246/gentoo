@@ -1,4 +1,4 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -14,7 +14,7 @@ SRC_URI="mirror://sourceforge/clucene/${MY_P}.tar.gz"
 
 LICENSE="|| ( Apache-2.0 LGPL-2.1 )"
 SLOT="1"
-KEYWORDS="alpha amd64 arm hppa ia64 ~mips ppc ppc64 sparc x86 ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos"
+KEYWORDS="alpha amd64 arm ~arm64 hppa ia64 ~mips ppc ppc64 sparc x86 ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos"
 
 IUSE="debug doc static-libs"
 
@@ -36,7 +36,7 @@ PATCHES=(
 )
 
 src_prepare() {
-	default
+	cmake-utils_src_prepare
 
 	# patch out installing bundled boost headers, we build against system one
 	sed -i \
@@ -47,7 +47,7 @@ src_prepare() {
 
 src_configure() {
 	# Disabled threads: see upstream bug
-	# https://sourceforge.net/tracker/?func=detail&aid=3237301&group_id=80013&atid=558446
+	# https://sourceforge.net/p/clucene/bugs/197/
 	local mycmakeargs=(
 		-DENABLE_ASCII_MODE=OFF
 		-DENABLE_PACKAGING=OFF

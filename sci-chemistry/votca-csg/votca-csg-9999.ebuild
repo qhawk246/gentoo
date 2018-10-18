@@ -1,4 +1,4 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -8,7 +8,7 @@ CMAKE_MAKEFILE_GENERATOR="ninja"
 inherit bash-completion-r1 cmake-utils multilib
 
 IUSE="doc examples extras +gromacs hdf5"
-PDEPEND="extras? ( =sci-chemistry/${PN}apps-${PV} )"
+PDEPEND="extras? ( ~sci-chemistry/${PN}apps-${PV} )"
 if [ "${PV}" != "9999" ]; then
 	SRC_URI="https://github.com/${PN/-//}/archive/v${PV}.tar.gz -> ${P}.tar.gz
 		doc? ( https://github.com/${PN/-//}-manual/releases/download/v${PV}/${PN}-manual-${PV}.pdf )
@@ -19,6 +19,7 @@ else
 	inherit git-r3
 	EGIT_REPO_URI="https://github.com/${PN/-//}.git"
 	KEYWORDS=""
+	PDEPEND="${PDEPEND} doc? ( ~app-doc/${PN}-manual-${PV} )"
 fi
 
 DESCRIPTION="Votca coarse-graining engine"
@@ -28,7 +29,8 @@ LICENSE="Apache-2.0"
 SLOT="0"
 
 RDEPEND="
-	=sci-libs/votca-tools-${PV}
+	~sci-libs/votca-tools-${PV}
+	>=dev-cpp/eigen-3.3
 	gromacs? ( sci-chemistry/gromacs:= )
 	hdf5? ( sci-libs/hdf5 )
 	dev-lang/perl
@@ -51,12 +53,6 @@ src_unpack() {
 		default
 	else
 		git-r3_src_unpack
-		if use doc; then
-			EGIT_REPO_URI="https://github.com/${PN/-//}-manual.git"
-			EGIT_BRANCH="master"
-			EGIT_CHECKOUT_DIR="${WORKDIR}/${PN}-manual"\
-				git-r3_src_unpack
-		fi
 		if use examples; then
 			EGIT_REPO_URI="https://github.com/${PN/-//}-tutorials.git"
 			EGIT_BRANCH="master"
@@ -84,15 +80,7 @@ src_install() {
 		bashcomp_alias csg_call "${i##*/}"
 	done
 	if use doc; then
-		if [[ ${PV} = *9999* ]]; then
-			#we need to do that here, because we need an installed version of csg to build the manual
-			[[ ${CHOST} = *-darwin* ]] && \
-				emake -C "${WORKDIR}/${PN}"-manual PATH="${PATH}${PATH:+:}${ED}/usr/bin" DYLD_LIBRARY_PATH="${DYLD_LIBRARY_PATH}${DYLD_LIBRARY_PATH:+:}${ED}/usr/$(get_libdir)" \
-				|| emake -C "${WORKDIR}/${PN}"-manual PATH="${PATH}${PATH:+:}${ED}/usr/bin" LD_LIBRARY_PATH="${LD_LIBRARY_PATH}${LD_LIBRARY_PATH:+:}${ED}/usr/$(get_libdir)"
-			newdoc "${WORKDIR}/${PN}"-manual/manual.pdf "${PN}-manual-${PV}.pdf"
-		else
-			dodoc "${DISTDIR}/${PN}-manual-${PV}.pdf"
-		fi
+		[[ ${PV} != *9999* ]] && dodoc "${DISTDIR}/${PN}-manual-${PV}.pdf"
 		cmake-utils_src_make -C "${CMAKE_BUILD_DIR}" html
 		dodoc -r "${CMAKE_BUILD_DIR}"/share/doc/html
 	fi

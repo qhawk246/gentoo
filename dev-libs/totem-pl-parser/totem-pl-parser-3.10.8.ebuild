@@ -1,4 +1,4 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -11,10 +11,10 @@ HOMEPAGE="https://developer.gnome.org/totem-pl-parser/stable/"
 LICENSE="LGPL-2+"
 SLOT="0/18"
 IUSE="archive crypt +introspection +quvi test"
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~ia64 ~ppc ~ppc64 ~sparc ~x86 ~x86-fbsd"
+KEYWORDS="~alpha amd64 ~arm ~arm64 ~ia64 ~ppc ~ppc64 ~sparc x86 ~x86-fbsd"
 
 RDEPEND="
-	>=dev-libs/glib-2.31:2
+	>=dev-libs/glib-2.36:2
 	dev-libs/gmime:2.6
 	>=net-libs/libsoup-2.43:2.4
 	archive? ( >=app-arch/libarchive-3 )
@@ -26,6 +26,7 @@ DEPEND="${RDEPEND}
 	!<media-video/totem-2.21
 	dev-libs/gobject-introspection-common
 	>=dev-util/intltool-0.35
+	dev-util/glib-utils
 	>=dev-util/gtk-doc-am-1.14
 	sys-devel/autoconf-archive
 	>=sys-devel/gettext-0.17
@@ -55,9 +56,13 @@ src_prepare() {
 }
 
 src_configure() {
+	# uninstalled-tests is abused to switch from loading live FS helper
+	# to in-build-tree helper, check on upgrades this is not having other
+	# consequences, bug #630242
 	gnome2_src_configure \
 		--disable-static \
 		--enable-gmime=2.6 \
+		--enable-uninstalled-tests \
 		$(use_enable archive libarchive) \
 		$(use_enable crypt libgcrypt) \
 		$(use_enable quvi) \

@@ -1,4 +1,4 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -7,11 +7,11 @@ PYTHON_COMPAT=( python2_7 )
 inherit eutils elisp-common gnome2 python-single-r1 readme.gentoo-r1
 
 DESCRIPTION="GTK+ Documentation Generator"
-HOMEPAGE="http://www.gtk.org/gtk-doc/"
+HOMEPAGE="https://www.gtk.org/gtk-doc/"
 
 LICENSE="GPL-2 FDL-1.1"
 SLOT="0"
-KEYWORDS="alpha amd64 arm ~arm64 hppa ia64 ~m68k ~mips ppc ppc64 ~s390 ~sh sparc x86 ~amd64-fbsd ~sparc-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x86-macos ~sparc-solaris ~x64-solaris"
+KEYWORDS="alpha amd64 arm arm64 hppa ia64 ~m68k ~mips ppc ppc64 s390 ~sh sparc x86 ~amd64-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x86-macos ~sparc-solaris ~x64-solaris"
 
 IUSE="debug doc emacs highlight vim"
 REQUIRED_USE="${PYTHON_REQUIRED_USE}"
@@ -49,6 +49,10 @@ pkg_setup() {
 src_prepare() {
 	# Remove global Emacs keybindings, bug #184588
 	eapply "${FILESDIR}"/${PN}-1.8-emacs-keybindings.patch
+
+	# Apply upstream commit 1baf9a6, bug #646850
+	sed -e '1,/exit 1/s/exit 1/exit $1/' \
+		-i gtkdoc-mkpdf.in || die
 
 	gnome2_src_prepare
 }

@@ -1,4 +1,4 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -13,7 +13,7 @@ SRC_URI="https://github.com/GNS3/${PN}/archive/v${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="GPL-3"
 SLOT="0"
-KEYWORDS="~amd64"
+KEYWORDS="~amd64 ~x86"
 # tests are severely broken upstream and they have been notified
 RESTRICT="test"
 
@@ -24,7 +24,7 @@ RDEPEND="
 	>=dev-python/ws4py-0.3.4[${PYTHON_USEDEP}]
 	>=dev-python/requests-2.6.0[${PYTHON_USEDEP}]
 	>=dev-python/paramiko-1.15.1[${PYTHON_USEDEP}]
-	=net-misc/gns3-server-$PVR[${PYTHON_USEDEP}]
+	~net-misc/gns3-server-${PV}[${PYTHON_USEDEP}]
 	dev-python/PyQt5[gui,network,svg,widgets,${PYTHON_USEDEP}]
 "
 DEPEND="dev-python/setuptools[${PYTHON_USEDEP}]"

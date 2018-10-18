@@ -1,4 +1,4 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI="6"
@@ -16,7 +16,7 @@ if [[ ${PV} == *9999 ]] ; then
 	S="${WORKDIR}/${MY_P}/${PN}"
 else
 	SRC_URI="https://raw.githubusercontent.com/wiki/SELinuxProject/selinux/files/releases/${MY_RELEASEDATE}/${MY_P}.tar.gz"
-	KEYWORDS="~amd64 ~arm ~arm64 ~mips ~x86"
+	KEYWORDS="amd64 ~arm ~arm64 ~mips x86"
 	S="${WORKDIR}/${MY_P}"
 fi
 
@@ -28,6 +28,7 @@ SLOT="0"
 
 DEPEND=">=sys-libs/libsepol-${PV}:=
 	>=sys-libs/libselinux-${PV}:=
+	dev-libs/dbus-glib
 	dev-libs/libpcre:=
 	>=sys-libs/libcap-1.10-r10:="
 

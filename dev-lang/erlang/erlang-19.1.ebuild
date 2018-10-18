@@ -10,14 +10,14 @@ inherit autotools elisp-common eutils java-pkg-opt-2 multilib systemd versionato
 # open up a bug to let it be created.
 
 DESCRIPTION="Erlang programming language, runtime environment and libraries (OTP)"
-HOMEPAGE="http://www.erlang.org/"
-SRC_URI="http://www.erlang.org/download/otp_src_${PV}.tar.gz
+HOMEPAGE="https://www.erlang.org/"
+SRC_URI="http://erlang.org/download/otp_src_${PV}.tar.gz
 	http://erlang.org/download/otp_doc_man_${PV}.tar.gz
 	doc? ( http://erlang.org/download/otp_doc_html_${PV}.tar.gz )"
 
 LICENSE="Apache-2.0"
 SLOT="0"
-KEYWORDS="alpha amd64 ~arm ~arm64 ~ia64 ppc ppc64 sparc x86 ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~x64-solaris"
+KEYWORDS="alpha amd64 ~arm ~arm64 ~hppa ~ia64 ppc ppc64 sparc x86 ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~x64-solaris"
 IUSE="compat-ethread dirty-schedulers doc emacs hipe java kpoll libressl odbc smp sctp ssl systemd tk wxwidgets"
 
 RDEPEND="

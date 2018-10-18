@@ -1,4 +1,4 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
@@ -13,7 +13,7 @@ LICENSE="GPL-2+ LGPL-2+ FDL-1.1"
 SLOT="0"
 IUSE="exif gnome +introspection packagekit +previewer selinux sendto tracker xmp"
 
-KEYWORDS="~alpha amd64 ~arm ~ia64 ~ppc ~ppc64 ~sh ~sparc x86 ~x86-fbsd ~amd64-linux ~arm-linux ~x86-linux"
+KEYWORDS="~alpha amd64 ~arm ~ia64 ~ppc ~ppc64 ~sh ~sparc x86 ~x86-fbsd ~amd64-linux ~x86-linux"
 
 # FIXME: tests fails under Xvfb, but pass when building manually
 # "FAIL: check failed in nautilus-file.c, line 8307"
@@ -48,7 +48,7 @@ DEPEND="${COMMON_DEPEND}
 	>=dev-util/intltool-0.50
 	sys-devel/gettext
 	virtual/pkgconfig
-	x11-proto/xproto
+	x11-base/xorg-proto
 "
 RDEPEND="${COMMON_DEPEND}
 	packagekit? ( app-admin/packagekit-base )
@@ -64,7 +64,7 @@ PDEPEND="
 	tracker? ( >=gnome-extra/nautilus-tracker-tags-0.12 )
 	previewer? ( >=gnome-extra/sushi-0.1.9 )
 	sendto? ( >=gnome-extra/nautilus-sendto-3.0.1 )
-	>=gnome-base/gvfs-1.14[gtk]
+	>=gnome-base/gvfs-1.14[gtk(+)]
 "
 # Need gvfs[gtk] for recent:/// support
 

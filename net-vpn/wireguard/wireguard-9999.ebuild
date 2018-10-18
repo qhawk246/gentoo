@@ -1,8 +1,9 @@
-# Copyright 1999-2017 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
 
+MODULES_OPTIONAL_USE="module"
 inherit linux-mod bash-completion-r1
 
 DESCRIPTION="Simple yet fast and modern VPN that utilizes state-of-the-art cryptography."
@@ -25,10 +26,9 @@ IUSE="debug +module +tools module-src"
 DEPEND="tools? ( net-libs/libmnl )"
 RDEPEND="${DEPEND}"
 
-MODULE_NAMES="wireguard(net:src)"
+MODULE_NAMES="wireguard(kernel/drivers/net:src)"
 BUILD_TARGETS="module"
-CONFIG_CHECK="NET INET NET_UDP_TUNNEL CRYPTO_BLKCIPHER ~PADATA"
-WARNING_PADATA="If you're running a multicore system you likely should enable CONFIG_PADATA for improved performance and parallel crypto."
+CONFIG_CHECK="NET INET NET_UDP_TUNNEL CRYPTO_BLKCIPHER"
 
 pkg_setup() {
 	if use module; then
@@ -38,10 +38,10 @@ pkg_setup() {
 }
 
 src_compile() {
-	BUILD_PARAMS="KERNELDIR=${KERNEL_DIR} V=1"
+	BUILD_PARAMS="KERNELDIR=${KERNEL_DIR}"
 	use debug && BUILD_PARAMS="CONFIG_WIREGUARD_DEBUG=y ${BUILD_PARAMS}"
 	use module && linux-mod_src_compile
-	use tools && emake RUNSTATEDIR="${EPREFIX}/run" -C src/tools
+	use tools && emake RUNSTATEDIR="${EPREFIX}/run" -C src/tools CC="$(tc-getCC)" LD="$(tc-getLD)"
 }
 
 src_install() {
@@ -57,8 +57,6 @@ src_install() {
 			BASHCOMPDIR="$(get_bashcompdir)" \
 			PREFIX="${EPREFIX}/usr" \
 			-C src/tools install
-		insinto /$(get_libdir)/netifrc/net
-		newins "${FILESDIR}"/wireguard-openrc.sh wireguard.sh
 	fi
 	use module-src && emake DESTDIR="${D}" PREFIX="${EPREFIX}/usr" -C src dkms-install
 }
@@ -81,7 +79,7 @@ pkg_postinst() {
 	einfo "As such, it may contain significant issues. Please do not file"
 	einfo "bug reports with Gentoo, but rather direct them upstream to:"
 	einfo
-	einfo "    team@wireguard.io    security@wireguard.io"
+	einfo "    team@wireguard.com    security@wireguard.com"
 	einfo
 
 	if use tools; then
@@ -103,7 +101,7 @@ pkg_postinst() {
 		einfo "\"default-route\" argument. You may not use this server for any abusive or illegal"
 		einfo "purposes. It is for quick testing only."
 		einfo
-		einfo "More info on getting started can be found at: https://www.wireguard.io/quickstart/"
+		einfo "More info on getting started can be found at: https://www.wireguard.com/quickstart/"
 		einfo
 	fi
 	if use module; then

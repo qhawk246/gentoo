@@ -1,9 +1,11 @@
-# Copyright 1999-2012 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
+EAPI=0
+
 DESCRIPTION="A small bundle of utilities to work with CVS repositories"
-HOMEPAGE="http://www.red-bean.com/cvsutils/"
-SRC_URI="http://www.red-bean.com/cvsutils/releases/${P}.tar.gz"
+HOMEPAGE="https://www.red-bean.com/cvsutils/"
+SRC_URI="https://www.red-bean.com/cvsutils/releases/${P}.tar.gz"
 
 LICENSE="GPL-3"
 SLOT="0"

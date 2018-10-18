@@ -3,10 +3,10 @@
 
 EAPI=6
 
-inherit cmake-utils multilib
+inherit cmake-utils
 
 DESCRIPTION="Tools for accessing and converting various ebook file formats"
-HOMEPAGE="https://sourceforge.net/projects/ebook-tools"
+HOMEPAGE="https://sourceforge.net/projects/ebook-tools/"
 SRC_URI="mirror://sourceforge/${PN}/${P}.tar.gz"
 
 LICENSE="MIT"
@@ -22,10 +22,8 @@ RDEPEND="${DEPEND}
 	lit2epub? ( app-text/convertlit	)
 "
 
-DOCS=( INSTALL README TODO )
-
 src_prepare() {
-	default
+	cmake-utils_src_prepare
 
 	use lit2epub || sed -i -e '\|lit2epub|d' -- 'src/tools/CMakeLists.txt' || die
 }

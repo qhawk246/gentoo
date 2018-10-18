@@ -1,19 +1,20 @@
-# Copyright 1999-2016 Gentoo Foundation
+# Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=6
+
 inherit git-r3 autotools
 
 DESCRIPTION="An MPD client that submits information to Audioscrobbler"
-HOMEPAGE="http://mpd.wikia.com/wiki/Client:Mpdscribble"
-EGIT_REPO_URI="git://git.musicpd.org/master/mpdscribble.git"
+HOMEPAGE="https://www.musicpd.org/clients/mpdscribble/"
+EGIT_REPO_URI="https://github.com/MusicPlayerDaemon/mpdscribble.git"
 
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS=""
 IUSE="+curl"
 
-RDEPEND="dev-libs/glib
+RDEPEND="dev-libs/glib:2
 	media-libs/libmpdclient
 	curl? ( net-misc/curl )
 	!curl? ( net-libs/libsoup:2.4 )"
@@ -33,5 +34,5 @@ src_configure() {
 src_install() {
 	default
 	newinitd "${FILESDIR}/mpdscribble.rc" mpdscribble
-	dodir /var/cache/mpdscribble
+	keepdir /var/cache/mpdscribble
 }

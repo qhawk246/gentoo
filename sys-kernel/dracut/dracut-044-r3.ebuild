@@ -3,7 +3,7 @@
 
 EAPI=6
 
-inherit bash-completion-r1 linux-info toolchain-funcs systemd
+inherit bash-completion-r1 eutils linux-info toolchain-funcs systemd
 
 DESCRIPTION="Generic initramfs generation tool"
 HOMEPAGE="https://dracut.wiki.kernel.org"
@@ -28,7 +28,6 @@ RDEPEND="${CDEPEND}
 	|| (
 		>=sys-apps/sysvinit-2.87-r3
 		sys-apps/systemd[sysv-utils]
-		sys-apps/systemd-sysv-utils
 	)
 	>=sys-apps/util-linux-2.21
 
